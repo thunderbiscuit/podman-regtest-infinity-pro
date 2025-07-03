@@ -3,7 +3,7 @@
 Start the podman machine and `RegtestBitcoinEnv` container to fire up all services:
 
 ```shell
-cd ~/podman/regtest-in-a-pod/
+cd ~/podman/podman-regtest-infinity-pro/
 just start
 
 # Alternatively, use

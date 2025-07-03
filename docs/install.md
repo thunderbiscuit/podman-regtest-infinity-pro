@@ -9,7 +9,7 @@ Then create a directory called `podman` somewhere on your machine and clone the 
 
 ```shell
 mkdir ~/podman/
-git clone https://github.com/thunderbiscuit/regtest-in-a-pod.git
+git clone https://github.com/thunderbiscuit/podman-regtest-infinity-pro.git
 ```
 
 Make sure you have a podman machine enabled with sufficient resources. 

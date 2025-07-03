@@ -1,6 +1,6 @@
-site_name: "Regtest in a Pod"
-repo_name: "regtest-in-a-pod"
-repo_url: https://github.com/thunderbiscuit/regtest-in-a-pod
+site_name: "Podman Regtest Infinity Pro"
+repo_name: "podman-regtest-infinity-pro"
+repo_url: https://github.com/thunderbiscuit/podman-regtest-infinity-pro
 
 theme:
   name: material

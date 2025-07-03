@@ -1,7 +1,9 @@
 # Readme
-This repo is a companion to the [Using Podman Containers for Regtest Bitcoin Development](https://thunderbiscuit.com/posts/podman-bitcoin/) blog article.
 
-It allows you to create a robust regtest environment which you can turn on and off at will using Podman. The final environment includes a lot of useful tools, namely:
+The [Using Podman Containers for Regtest Bitcoin Development](https://thunderbiscuit.com/posts/podman-bitcoin/) blog article is a companion to this project. Check out [our docs](https://thunderbiscuit.github.io/podman-regtest-infinity-pro/) for even more information.
+
+The _Podman Regtest Infinity Pro_ allows you to create a robust regtest environment which you can turn on and off at will using Podman. The final environment includes a lot of useful tools, namely:
+
 1. A bitcoin core node and daemon (serving compact block filters)
 2. bitcoin-cli enabled
 3. An Electrum server
@@ -12,7 +14,8 @@ It allows you to create a robust regtest environment which you can turn on and o
 Read the article linked above for all the information on how to use the container to its fullest, but here is a quick cheatsheet:
 
 ## Usage
-You can use the [`just`](https://github.com/casey/just) tool and leverage the commands defined in the `justfile`.
+
+Use the [`just`](https://github.com/casey/just) tool and leverage the commands defined in the `justfile`.
 
 ```shell
 just mine 21
@@ -22,9 +25,14 @@ just esploralogs
 ```
 
 ## Building, Starting, and Stopping the Pod
+
 ```shell
-# Building the container
-cd ~/podman/regtest-in-a-pod/
+# Clone the repo, say in ~/podman/
+cd ~/podman/
+git clone https://github.com/thunderbiscuit/podman-regtest-infinity-pro.git
+
+# Build the container
+cd ~/podman/podman-regtest-infinity-pro/
 podman machine start regtest
 
 # Set BITCOIN_VERSION and TARGET_ARCH to use the bitcoin core versions you need using the --build-arg argument on the podman command.
