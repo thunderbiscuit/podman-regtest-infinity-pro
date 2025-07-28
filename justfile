@@ -1,9 +1,14 @@
-[group("Podman")]
+[group("Repo")]
 [doc("List all available commands.")]
 @default:
   just --list --unsorted
 
-[group("Podman")]
+[group("Repo")]
+[doc("Open repository on GitHub.")]
+repo:
+  open https://github.com/thunderbiscuit/podman-regtest-infinity-pro/
+
+[group("Docs")]
 [doc("List the available services and their endpoints.")]
 @services:
   echo "Electrum server:                       tcp://127.0.0.1:60401"
@@ -12,25 +17,30 @@
   echo "Esplora server  (Android emulators):   http://10.0.2.2:3002"
   echo "Fast Bitcoin Block Explorer:           http://127.0.0.1:3003"
 
-[group("Podman")]
+[group("Docs")]
+[doc("Serve the local docs.")]
+servedocs:
+  mkdocs serve
+
+[group("Pod")]
 [doc("Start your podman machine and regtest environment.")]
 start:
   podman machine start regtest
   podman --connection regtest start RegtestBitcoinEnv
 
-[group("Podman")]
+[group("Pod")]
 [doc("Stop your podman machine and regtest environment.")]
 stop:
   COOKIE=$(just cookie) && bitcoin-cli --chain=regtest --rpcuser=__cookie__ --rpcpassword=$COOKIE stop
   podman --connection regtest stop RegtestBitcoinEnv
   podman machine stop regtest
 
-[group("Podman")]
+[group("Pod")]
 [doc("Enter the shell in the pod.")]
 podshell:
   podman --connection regtest exec -it RegtestBitcoinEnv /bin/bash
 
-[group("Podman")]
+[group("Pod")]
 [doc("Open the block explorer.")]
 explorer:
   open http://127.0.0.1:3003
@@ -46,12 +56,12 @@ explorer:
   COOKIE=$(just cookie) && bitcoin-cli --chain=regtest --rpcuser=__cookie__ --rpcpassword=$COOKIE generatetoaddress {{BLOCKS}} bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq
 
 [group("Bitcoin Core")]
-[doc("Send mining reward to <ADDRESS>")]
+[doc("Send mining reward to <ADDRESS>.")]
 @sendminingrewardto ADDRESS:
   COOKIE=$(just cookie) && bitcoin-cli --chain=regtest --rpcuser=__cookie__ --rpcpassword=$COOKIE generatetoaddress 1 {{ADDRESS}}
 
 [group("Bitcoin Core")]
-[doc("Send a command to bitcoin-cli")]
+[doc("Send a command to bitcoin-cli.")]
 @cli COMMAND:
   COOKIE=$(just cookie) && bitcoin-cli --chain=regtest --rpcuser=__cookie__ --rpcpassword=$COOKIE {{COMMAND}}
 
@@ -74,16 +84,6 @@ esploralogs:
 [doc("Print block explorer logs to console.")]
 explorerlogs:
   podman --connection regtest exec -it RegtestBitcoinEnv tail -f /root/log/fbbe.log
-
-[group("Docs")]
-[doc("Serve the local docs.")]
-servedocs:
-  mkdocs serve
-
-[group("Docs")]
-[doc("Open the website for docs.")]
-docs:
-  open https://thunderbiscuit.github.io/regtest-in-a-pod/
 
 [group("Default Wallet")]
 [doc("Create a default wallet.")]
