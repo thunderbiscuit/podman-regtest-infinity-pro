@@ -11,6 +11,8 @@ The _Podman Regtest Infinity Pro_ allows you to create a robust regtest environm
 5. A block explorer
 6. Useful just commands for working with the daemon from your command line
 
+For a quick overview of how the setup works once its enabled, [check out this YouTube video](https://www.youtube.com/watch?v=zofo5k9Cwcg).
+
 Read the article linked above for all the information on how to use the container to its fullest, but here is a quick cheatsheet:
 
 ## Usage

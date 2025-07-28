@@ -1,6 +1,8 @@
 # A Full Regtest Setup Available on Command
 
-The goal of this project is to provide bitcoin software developers a simple and powerful regtest setup ready to go, easy to power up and down in a few seconds. For a quick overview of how the setup works once its enabled, [check out this YouTube video](https://www.youtube.com/watch?v=zofo5k9Cwcg).
+This isn't just your run-of-the-mill, typical Podman Regtest Infinity setup... _**it's the Podman Regtest Infinity Pro**_!
+
+The goal of this project is to provide bitcoin software developers a simple and powerful regtest setup always at the ready and easy to power up and down in just a few seconds. For a quick overview of how the setup works once its enabled, [check out this YouTube video](https://www.youtube.com/watch?v=zofo5k9Cwcg).
 
 Once up, the [Podman container](https://podman.io/) offers:
 
