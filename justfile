@@ -18,9 +18,14 @@ repo:
   echo "Fast Bitcoin Block Explorer:           http://127.0.0.1:3003"
 
 [group("Docs")]
+[doc("Build the local docs.")]
+builddocs:
+  uv run zensical build
+
+[group("Docs")]
 [doc("Serve the local docs.")]
 servedocs:
-  mkdocs serve
+  uv run zensical serve
 
 [group("Pod")]
 [doc("Start your podman machine and regtest environment.")]
