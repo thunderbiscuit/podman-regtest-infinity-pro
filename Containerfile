@@ -28,10 +28,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Rust toolchain
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.75.0
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.92.0
 # Set the environment variable so that Cargo is in PATH
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN rustup default 1.75.0
+RUN rustup default 1.92.0
 
 # Build Esplora and Electrum services
 WORKDIR /root/electrs/
@@ -43,7 +43,6 @@ RUN cargo build --release
 # Build Fast Bitcoin Block Explorer
 WORKDIR /root/fbbe/
 RUN git clone https://github.com/RCasatta/fbbe .
-RUN rustup override set 1.75.0
 RUN cargo build --release
 
 COPY start-services.sh /usr/local/bin/
