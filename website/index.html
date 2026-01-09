@@ -79,29 +79,16 @@
         }
 
         .neon-text {
-            text-shadow:
-                0 0 10px currentColor,
-                0 0 20px currentColor,
-                0 0 30px currentColor,
-                0 0 40px var(--neon-cyan);
-            animation: pulse-glow 2s ease-in-out infinite;
+            text-shadow: 0 0 15px var(--neon-cyan);
+            animation: pulse-glow 2.8s ease-in-out infinite;
         }
 
         @keyframes pulse-glow {
             0%, 100% {
-                text-shadow:
-                    0 0 10px currentColor,
-                    0 0 20px currentColor,
-                    0 0 30px currentColor,
-                    0 0 40px var(--neon-cyan);
+                text-shadow: 0 0 15px var(--neon-cyan);
             }
             50% {
-                text-shadow:
-                    0 0 20px currentColor,
-                    0 0 30px currentColor,
-                    0 0 40px currentColor,
-                    0 0 60px var(--neon-cyan),
-                    0 0 80px var(--neon-cyan);
+                text-shadow: 0 0 30px var(--neon-cyan);
             }
         }
 
