@@ -62,7 +62,7 @@ explorer:
 
 [group("Bitcoin Core")]
 [doc("Send mining reward to <ADDRESS>.")]
-@sendminingrewardto ADDRESS:
+@mineandsendrewardto ADDRESS:
   COOKIE=$(just cookie) && bitcoin-cli --chain=regtest --rpcuser=__cookie__ --rpcpassword=$COOKIE generatetoaddress 1 {{ADDRESS}}
 
 [group("Bitcoin Core")]
