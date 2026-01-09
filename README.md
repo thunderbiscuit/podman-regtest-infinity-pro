@@ -2,7 +2,7 @@
 
 The [Using Podman Containers for Regtest Bitcoin Development](https://thunderbiscuit.com/posts/podman-bitcoin/) blog article is a companion to this project. Check out [our docs](https://thunderbiscuit.github.io/podman-regtest-infinity-pro/) for even more information.
 
-The _Podman Regtest Infinity Pro_ allows you to create a robust regtest environment which you can turn on and off at will using Podman. The final environment includes a lot of useful tools, namely:
+The [_Podman Regtest Infinity Pro_](https://regtestinfinitypro.dev/) allows you to create a robust regtest environment which you can turn on and off at will using Podman. The final environment includes a lot of useful tools, namely:
 
 1. A bitcoin core node and daemon (serving compact block filters)
 2. bitcoin-cli enabled
