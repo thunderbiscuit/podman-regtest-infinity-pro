@@ -1,8 +1,6 @@
 # Readme
 
-The [Using Podman Containers for Regtest Bitcoin Development](https://thunderbiscuit.com/posts/podman-bitcoin/) blog article is a companion to this project. Check out [our docs](https://thunderbiscuit.github.io/podman-regtest-infinity-pro/) for even more information.
-
-The [_Podman Regtest Infinity Pro_](https://regtestinfinitypro.dev/) allows you to create a robust regtest environment which you can turn on and off at will using Podman. The final environment includes a lot of useful tools, namely:
+The _Podman Regtest Infinity Pro_ allows you to create a robust regtest environment which you can turn on and off at will using Podman. The final environment includes a lot of useful tools, namely:
 
 1. A bitcoin core node and daemon (serving compact block filters)
 2. bitcoin-cli enabled
@@ -11,11 +9,16 @@ The [_Podman Regtest Infinity Pro_](https://regtestinfinitypro.dev/) allows you 
 5. A block explorer
 6. Useful just commands for working with the daemon from your command line
 
-For a quick overview of how the setup works once its enabled, [check out this YouTube video](https://www.youtube.com/watch?v=zofo5k9Cwcg).
+## Get Started
 
-Read the article linked above for all the information on how to use the container to its fullest, but here is a quick cheatsheet:
+To get started with the _Podman Regtest Infinity Pro_, check out:
 
-## Usage
+- [The website](https://regtestinfinitypro.dev/)
+- [The docs](https://thunderbiscuit.github.io/podman-regtest-infinity-pro/)
+- [The original companion blog post](https://thunderbiscuit.com/posts/podman-bitcoin/)
+- [The YouTube overview and demo](https://www.youtube.com/watch?v=zofo5k9Cwcg)
+
+## Usage Overview
 
 Use the [`just`](https://github.com/casey/just) tool and leverage the commands defined in the `justfile`.
 
