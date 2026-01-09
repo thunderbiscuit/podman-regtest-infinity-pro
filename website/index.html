@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Podman Regtest Infinity Pro - A feature-full Bitcoin regtest setup at your fingertips">
+    <title>Podman Regtest Infinity Pro</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        /* ========== CSS Variables ========== */
+        :root {
+            --neon-pink: #FF006E;
+            --neon-cyan: #00F5FF;
+            --neon-yellow: #FFBE0B;
+            --neon-purple: #8338EC;
+            --dark-bg: #0A0E27;
+            --darker-bg: #050818;
+            --grid-color: rgba(0, 245, 255, 0.1);
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0BEC5;
+            --card-bg: rgba(10, 14, 39, 0.8);
+        }
+
+        /* ========== Reset & Base Styles ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 245, 255, 0.03) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0, 245, 255, 0.03) 2px, transparent 2px),
+                linear-gradient(rgba(255, 0, 110, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 110, 0.02) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+            pointer-events: none;
+            z-index: 0;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(100px); }
+        }
+
+        /* ========== Typography ========== */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+        }
+
+        .neon-text {
+            text-shadow:
+                0 0 10px currentColor,
+                0 0 20px currentColor,
+                0 0 30px currentColor,
+                0 0 40px var(--neon-cyan);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                text-shadow:
+                    0 0 10px currentColor,
+                    0 0 20px currentColor,
+                    0 0 30px currentColor,
+                    0 0 40px var(--neon-cyan);
+            }
+            50% {
+                text-shadow:
+                    0 0 20px currentColor,
+                    0 0 30px currentColor,
+                    0 0 40px currentColor,
+                    0 0 60px var(--neon-cyan),
+                    0 0 80px var(--neon-cyan);
+            }
+        }
+
+        /* ========== Container ========== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== Navigation ========== */
+        nav {
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--neon-cyan);
+            box-shadow: 0 4px 20px rgba(0, 245, 255, 0.2);
+            z-index: 100;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            text-decoration: none;
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* ========== Hero Section ========== */
+        .hero {
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 8vw, 4.5rem);
+            color: var(--neon-cyan);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--neon-pink);
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .hero .tagline {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: 2px solid;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: transparent;
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow:
+                0 0 20px rgba(0, 245, 255, 0.3),
+                inset 0 0 20px rgba(0, 245, 255, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow:
+                0 0 30px rgba(0, 245, 255, 0.6),
+                inset 0 0 30px rgba(0, 245, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--neon-pink);
+            border-color: var(--neon-pink);
+            box-shadow:
+                0 0 20px rgba(255, 0, 110, 0.3),
+                inset 0 0 20px rgba(255, 0, 110, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: var(--neon-pink);
+            color: var(--dark-bg);
+            box-shadow:
+                0 0 30px rgba(255, 0, 110, 0.6),
+                inset 0 0 30px rgba(255, 0, 110, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* ========== Section Styles ========== */
+        section {
+            padding: 80px 0;
+            position: relative;
+        }
+
+        section h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            text-align: center;
+            margin-bottom: 60px;
+            color: var(--neon-purple);
+            text-shadow: 0 0 20px var(--neon-purple);
+        }
+
+        /* ========== Features Grid ========== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid var(--neon-cyan);
+            box-shadow:
+                0 0 20px rgba(0, 245, 255, 0.2),
+                inset 0 0 20px rgba(0, 245, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow:
+                0 0 40px rgba(0, 245, 255, 0.4),
+                inset 0 0 30px rgba(0, 245, 255, 0.1);
+            border-color: var(--neon-pink);
+        }
+
+        .feature-card .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            filter: drop-shadow(0 0 10px var(--neon-yellow));
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            color: var(--neon-cyan);
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ========== Services Section ========== */
+        .services-list {
+            background: var(--darker-bg);
+            padding: 40px;
+            border-radius: 10px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 30px rgba(131, 56, 236, 0.3);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(0, 245, 255, 0.05);
+            border-left: 3px solid var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .service-item:hover {
+            background: rgba(0, 245, 255, 0.1);
+            border-left-color: var(--neon-pink);
+            padding-left: 25px;
+        }
+
+        .service-name {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+
+        .service-endpoint {
+            color: var(--neon-yellow);
+        }
+
+        /* ========== Quick Start Section ========== */
+        .quick-start {
+            background: var(--darker-bg);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            border-radius: 50%;
+            background: transparent;
+            border: 3px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        .step h3 {
+            color: var(--neon-pink);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .code-block {
+            background: #0d1117;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--neon-cyan);
+            margin: 20px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .code-block .comment {
+            color: var(--text-secondary);
+        }
+
+        .code-block .command {
+            color: var(--neon-yellow);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--neon-purple);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        .copy-btn:hover {
+            background: var(--neon-pink);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ========== Resources Section ========== */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .resource-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid var(--neon-purple);
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 0 20px rgba(131, 56, 236, 0.2);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 40px rgba(255, 190, 11, 0.4);
+        }
+
+        .resource-card .icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .resource-card h3 {
+            color: var(--neon-cyan);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .resource-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ========== Footer ========== */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid var(--neon-cyan);
+            background: var(--darker-bg);
+            box-shadow: 0 -4px 20px rgba(0, 245, 255, 0.2);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        /* ========== Responsive Design ========== */
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 15px;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 60px 0;
+            }
+
+            section {
+                padding: 50px 0;
+            }
+
+            .features-grid,
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .code-block {
+                padding: 20px 15px;
+            }
+
+            .code-block pre {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ========== Fade In Animation ========== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="#" class="logo">REGTEST PRO</a>
+            <ul>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#quick-start">Quick Start</a></li>
+                <li><a href="#resources">Resources</a></li>
+                <li><a href="https://github.com/thunderbiscuit/podman-regtest-infinity-pro" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="neon-text">PODMAN REGTEST<br>INFINITY PRO</h1>
+            <p class="subtitle">[ BITCOIN DEVELOPMENT UNLEASHED ]</p>
+            <p class="tagline">A feature-full Bitcoin regtest environment at your fingertips. Spin up a complete development stack with Bitcoin Core, Electrum, Esplora, and more in seconds.</p>
+            <div class="cta-buttons">
+                <a href="#quick-start" class="btn btn-primary">GET STARTED</a>
+                <a href="https://thunderbiscuit.github.io/podman-regtest-infinity-pro/" target="_blank" class="btn btn-secondary">VIEW DOCS</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <h2>FEATURES</h2>
+            <div class="features-grid fade-in">
+                <div class="feature-card">
+                    <span class="icon">🪙</span>
+                    <h3>Bitcoin Core Node</h3>
+                    <p>Full Bitcoin Core daemon serving compact block filters on regtest mode. Complete control over your development blockchain.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">⚡</span>
+                    <h3>bitcoin-cli Ready</h3>
+                    <p>Direct access to bitcoin-cli commands with convenient just shortcuts. Mine blocks, send transactions, and more.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🔌</span>
+                    <h3>Electrum Server</h3>
+                    <p>Integrated Electrum server for wallet development and testing. Perfect for mobile and desktop applications.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🔍</span>
+                    <h3>Esplora Server</h3>
+                    <p>RESTful blockchain API with Esplora. Query transactions, addresses, and blocks with ease.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🌐</span>
+                    <h3>Block Explorer</h3>
+                    <p>Fast Bitcoin Block Explorer for visualizing your regtest blockchain. Beautiful UI for debugging.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="icon">🎮</span>
+                    <h3>Just Commands</h3>
+                    <p>Powerful command shortcuts with Just. Mine blocks, check logs, manage wallets - all simplified.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="container">
+            <h2>SERVICE ENDPOINTS</h2>
+            <div class="services-list fade-in">
+                <div class="service-item">
+                    <span class="service-name">Electrum Server</span>
+                    <span class="service-endpoint">tcp://127.0.0.1:60401</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Esplora Server</span>
+                    <span class="service-endpoint">http://127.0.0.1:3002</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Block Explorer</span>
+                    <span class="service-endpoint">http://127.0.0.1:3003</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Bitcoin RPC</span>
+                    <span class="service-endpoint">http://127.0.0.1:18443</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Android Emulator (Electrum)</span>
+                    <span class="service-endpoint">tcp://10.0.2.2:60401</span>
+                </div>
+                <div class="service-item">
+                    <span class="service-name">Android Emulator (Esplora)</span>
+                    <span class="service-endpoint">http://10.0.2.2:3002</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start Section -->
+    <section id="quick-start" class="quick-start">
+        <div class="container">
+            <h2>QUICK START</h2>
+            <div class="steps fade-in">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Clone</h3>
+                    <p>Clone the repository to your local machine</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Build</h3>
+                    <p>Build the container with your preferred Bitcoin version</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Start</h3>
+                    <p>Launch your complete regtest environment</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Develop</h3>
+                    <p>Start mining blocks and building your app</p>
+                </div>
+            </div>
+
+            <div class="code-block fade-in">
+                <button class="copy-btn" onclick="copyCode('code1')">COPY</button>
+                <pre id="code1"><span class="comment"># Clone the repository</span>
+git clone https://github.com/thunderbiscuit/podman-regtest-infinity-pro.git
+cd podman-regtest-infinity-pro
+
+<span class="comment"># Start Podman machine</span>
+podman machine start regtest
+
+<span class="comment"># Build the container (customize Bitcoin version)</span>
+podman --connection regtest build \
+  --build-arg BITCOIN_VERSION=28.1 \
+  --build-arg TARGET_ARCH=x86_64-linux-gnu \
+  --tag localhost/regtest:v1.0.0 \
+  --file ./Containerfile
+
+<span class="comment"># Create the container</span>
+podman --connection regtest create \
+  --name RegtestBitcoinEnv \
+  --publish 18443:18443 \
+  --publish 18444:18444 \
+  --publish 3002:3002 \
+  --publish 3003:3003 \
+  --publish 60401:60401 \
+  localhost/regtest:v1.0.0
+
+<span class="comment"># Start the environment</span>
+<span class="command">just start</span>
+
+<span class="comment"># Mine 21 blocks</span>
+<span class="command">just mine 21</span>
+
+<span class="comment"># Check Bitcoin Core status</span>
+<span class="command">just cli getblockchaininfo</span>
+
+<span class="comment"># Open the block explorer</span>
+<span class="command">just explorer</span></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources">
+        <div class="container">
+            <h2>RESOURCES</h2>
+            <div class="resources-grid fade-in">
+                <a href="https://github.com/thunderbiscuit/podman-regtest-infinity-pro" target="_blank" class="resource-card">
+                    <span class="icon">💾</span>
+                    <h3>GitHub</h3>
+                    <p>View source code, contribute, and report issues</p>
+                </a>
+                <a href="https://thunderbiscuit.github.io/podman-regtest-infinity-pro/" target="_blank" class="resource-card">
+                    <span class="icon">📚</span>
+                    <h3>Documentation</h3>
+                    <p>Complete guides for installation and usage</p>
+                </a>
+                <a href="https://www.youtube.com/watch?v=zofo5k9Cwcg" target="_blank" class="resource-card">
+                    <span class="icon">🎥</span>
+                    <h3>Video Tutorial</h3>
+                    <p>Watch a quick overview of the setup in action</p>
+                </a>
+                <a href="https://thunderbiscuit.com/posts/podman-bitcoin/" target="_blank" class="resource-card">
+                    <span class="icon">✍️</span>
+                    <h3>Blog Post</h3>
+                    <p>Deep dive into Podman containers for Bitcoin development</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Built with ⚡ by <a href="https://thunderbiscuit.com" target="_blank">thunderbiscuit</a></p>
+            <p>&copy; 2026 Podman Regtest Infinity Pro</p>
+        </div>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const text = codeElement.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'COPIED!';
+                btn.style.background = '#00F5FF';
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(element => {
+            observer.observe(element);
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
