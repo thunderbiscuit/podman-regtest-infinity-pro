@@ -1,0 +1,40 @@
+name: Example Using Pre-Built Container
+
+# This workflow demonstrates how other projects can use the pre-built
+# regtest container in their CI pipelines
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-with-regtest:
+    runs-on: ubuntu-24.04
+
+    services:
+      bitcoin-regtest:
+        image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.1.1
+        ports:
+          - 18443:18443
+          - 18444:18444
+          - 3002:3002
+          - 3003:3003
+          - 60401:60401
+        # options: >-
+        #   --health-cmd "bitcoin-cli -regtest -rpcuser=test -rpcpassword=test getblockchaininfo"
+        #   --health-interval 10s
+        #   --health-timeout 5s
+        #   --health-retries 5
+
+    steps:
+      - name: Wait for services to be ready
+        run: sleep 20
+
+      - name: Test Bitcoin RPC
+        run: |
+          echo "Testing connection to Bitcoin regtest node..."
+          curl http://localhost:18443/rest/chaininfo.json
+
+      - name: Run your tests here
+        run: |
+          echo "This is where you would run your actual test suite"
+          echo "The regtest environment is fully operational!"
