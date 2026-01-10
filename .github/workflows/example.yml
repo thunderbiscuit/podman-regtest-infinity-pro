@@ -19,11 +19,12 @@ jobs:
           - 3002:3002
           - 3003:3003
           - 60401:60401
+        # The container initialization step will wait until everything is ready before allowing other steps to run
         options: >-
-          --health-cmd "bitcoin-cli -regtest -rpcuser=regtest -rpcpassword=password getblockchaininfo"
+          --health-cmd "test $(bitcoin-cli -regtest -rpcuser=regtest -rpcpassword=password getblockcount) -gt 0"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 6
 
     steps:
       - name: Test Bitcoin RPC
