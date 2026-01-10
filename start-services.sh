@@ -4,7 +4,7 @@
 mkdir ~/log/
 
 # Start the bitcoin daemon
-bitcoind --chain=regtest --txindex --blockfilterindex --peerblockfilters --rpcbind=0.0.0.0 --rpcallowip=0.0.0.0/0 --rpcport=18443 --rest --printtoconsole > ~/log/bitcoin.log 2>&1 &
+bitcoind --chain=regtest --txindex --blockfilterindex --peerblockfilters --rpcbind=0.0.0.0 --rpcallowip=0.0.0.0/0 --rpcport=18443 --rpcuser=regtest --rpcpassword=password --rest --printtoconsole > ~/log/bitcoin.log 2>&1 &
 sleep 10
 
 # Start the blockchain explorer
@@ -16,7 +16,6 @@ sleep 10
 sleep 10
 
 # Mine 3 blocks
-COOKIE=$(cat /root/.bitcoin/regtest/.cookie | cut -d ':' -f2)
-bitcoin-cli --chain=regtest --rpcuser=__cookie__ --rpcpassword="$COOKIE" generatetoaddress 3 bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq
+bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password generatetoaddress 3 bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq
 
 wait
