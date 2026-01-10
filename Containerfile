@@ -38,12 +38,18 @@ WORKDIR /root/electrs/
 RUN rustup update
 RUN git clone https://github.com/Blockstream/electrs.git .
 RUN git checkout new-index
-RUN cargo build --release
+# Build and clean up intermediate artifacts to save disk space during build.
+# We keep only the final binary and remove build deps, fingerprints, and incremental cache.
+# This cleanup saves several GB and is crucial for building on smaller machines (20GB disk).
+RUN cargo build --release && \
+    rm -rf target/release/build target/release/deps target/release/.fingerprint target/release/incremental
 
 # Build Fast Bitcoin Block Explorer
 WORKDIR /root/fbbe/
 RUN git clone https://github.com/RCasatta/fbbe .
-RUN cargo build --release
+# Same cleanup strategy as electrs above to minimize disk usage during build
+RUN cargo build --release && \
+    rm -rf target/release/build target/release/deps target/release/.fingerprint target/release/incremental
 
 COPY start-services.sh /usr/local/bin/
 ENTRYPOINT ["start-services.sh"]
