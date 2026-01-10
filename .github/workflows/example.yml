@@ -12,27 +12,25 @@ jobs:
 
     services:
       bitcoin-regtest:
-        image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.1.1
+        image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.2.0
         ports:
           - 18443:18443
           - 18444:18444
           - 3002:3002
           - 3003:3003
           - 60401:60401
-        # options: >-
-        #   --health-cmd "bitcoin-cli -regtest -rpcuser=test -rpcpassword=test getblockchaininfo"
-        #   --health-interval 10s
-        #   --health-timeout 5s
-        #   --health-retries 5
+        options: >-
+          --health-cmd "bitcoin-cli -regtest -rpcuser=regtest -rpcpassword=password getblockchaininfo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-      - name: Wait for services to be ready
-        run: sleep 20
-
       - name: Test Bitcoin RPC
         run: |
           echo "Testing connection to Bitcoin regtest node..."
-          curl http://localhost:18443/rest/chaininfo.json
+          curl --user regtest:password --data-binary '{"jsonrpc":"1.0","id":"test","method":"getblockchaininfo","params":[]}' \
+            -H 'content-type: text/plain;' http://localhost:18443/ | jq
 
       - name: Run your tests here
         run: |
