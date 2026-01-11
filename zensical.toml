@@ -27,6 +27,7 @@ nav = [
   { "About" = "index.md" },
   { "Install" = "install.md" },
   { "Usage" = "usage.md" },
+  { "Architecture" = "architecture.md" },
 ]
 
 # With the "extra_css" option you can add your own CSS styling to customize
