@@ -12,7 +12,7 @@ sleep 10
 sleep 10
 
 # Start the Esplora and Electrum services
-/root/electrs/target/release/electrs -vvvv --daemon-dir /root/.bitcoin/ --http-addr 0.0.0.0:3002 --electrum-rpc-addr 0.0.0.0:60401 --network=regtest --lightmode > ~/log/esplora.log 2>&1 &
+/root/electrs/target/release/electrs -vvvv --daemon-dir /root/.bitcoin/ --http-addr 0.0.0.0:3002 --electrum-rpc-addr 0.0.0.0:60401 --network=regtest --lightmode --cookie regtest:password > ~/log/esplora.log 2>&1 &
 sleep 10
 
 # Mine 3 blocks
