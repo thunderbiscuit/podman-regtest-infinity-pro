@@ -1,3 +1,5 @@
 site/
 .venv/
 .cache/
+NOTES.md
+justfile.local

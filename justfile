@@ -1,3 +1,5 @@
+import? "justfile.local"
+
 [group("Repo")]
 [doc("List all available commands.")]
 @default:
