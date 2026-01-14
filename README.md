@@ -52,8 +52,8 @@ podman machine start regtest
 #    - win64
 #    - x86_64-linux-gnu
 
-podman --connection regtest build --build-arg BITCOIN_VERSION=28.1 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest:v1.0.0 --file ./Containerfile
-podman --connection regtest create --name RegtestBitcoinEnv --publish 18443:18443 --publish 18444:18444 --publish 3002:3002 --publish 3003:3003 --publish 60401:60401 localhost/regtest:v1.1.0
+podman --connection regtest build --build-arg BITCOIN_VERSION=28.1 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest:v0.1.0 --file ./Containerfile
+podman --connection regtest create --name RegtestInfinityPro --publish 18443:18443 --publish 18444:18444 --publish 3002:3002 --publish 3003:3003 --publish 60401:60401 localhost/regtest:v0.1.0
 
 # Using the container
 # Start the machine + pod

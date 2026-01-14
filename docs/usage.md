@@ -1,6 +1,6 @@
 # Usage
 
-Start the podman machine and `RegtestBitcoinEnv` container to fire up all services:
+Start the podman machine and `RegtestInfinityPro` container to fire up all services:
 
 ```shell
 cd ~/podman/podman-regtest-infinity-pro/
@@ -8,7 +8,7 @@ just start
 
 # Alternatively, use
 podman machine start regtest
-podman start RegtestBitcoinEnv
+podman start RegtestInfinityPro
 ```
 
 Once started, the container runs four services automatically:
@@ -325,3 +325,36 @@ just cli "createwallet "myotherwallet""
 # Use that wallet
 just cli "-rpcwallet=myotherwallet getnewaddress"
 ```
+
+### Creating Local Custom Commands
+
+You can extend the `justfile` with your own custom commands that won't be committed to the repository.
+
+Create a `justfile.local` file in the project root:
+
+```shell
+touch justfile.local
+```
+
+Add it to `.gitignore` so it stays local:
+
+```shell
+echo "justfile.local" >> .gitignore
+```
+
+Then add your custom commands to `justfile.local`. For example:
+
+```just
+# Check the health of all services
+@ping:
+  #!/usr/bin/env bash
+  if podman --connection regtest ps --format "{{{{.Names}}}}" | grep -q "^RegtestInfinityPro$"; then
+    echo "✓ Container running"
+  else
+    echo "✗ Container not running"
+  fi
+```
+
+**Important:** In justfiles, Go template syntax like `{{.Names}}` must be escaped by doubling the braces: `{{{{.Names}}}}`. This tells `just` to treat them as literal braces rather than variable interpolation.
+
+The main `justfile` already imports `justfile.local` (if it exists), so all your custom commands will appear when you run `just --list`.

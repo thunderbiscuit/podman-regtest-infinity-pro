@@ -2,6 +2,8 @@
 site_name = "The Podman Regtest Infinity Pro"
 site_description = "A feature-full bitcoin regtest setup at your fingertips."
 site_author = "thunderbiscuit"
+repo_url = "https://github.com/thunderbiscuit/podman-regtest-infinity-pro"
+repo_name = "podman-regtest-infinity-pro"
 
 # The site_url is the canonical URL for your site. When building online
 # documentation you should set this.
