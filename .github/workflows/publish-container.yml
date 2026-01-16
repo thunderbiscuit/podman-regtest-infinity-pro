@@ -9,7 +9,7 @@ on:
       bitcoin_version:
         description: 'Bitcoin Core version (e.g., 28.1)'
         required: false
-        default: '28.1'
+        default: '29.2'
       target_arch:
         description: 'Target architecture'
         required: false

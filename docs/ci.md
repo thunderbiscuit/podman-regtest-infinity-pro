@@ -8,14 +8,14 @@ Pull and run the latest pre-built image:
 
 ```bash
 # Using Docker
-docker pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.2.0
+docker pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.3.0
 docker run -d -p 18443:18443 -p 18444:18444 -p 3002:3002 -p 3003:3003 -p 60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.2.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.3.0
 
 # Using Podman
-podman pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.2.0
+podman pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.3.0
 podman run -d -p 18443:18443 -p 18444:18444 -p 3002:3002 -p 3003:3003 -p 60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.2.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.3.0
 ```
 
 ## GitHub Actions
@@ -33,7 +33,7 @@ jobs:
 
     services:
       bitcoin-regtest:
-        image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.2.0
+        image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
         ports:
           - 18443:18443
           - 18444:18444
@@ -65,7 +65,7 @@ Always pin to a specific full version in production:
 ```yaml
 services:
   bitcoin-regtest:
-    image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.2.0
+    image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 ```
 
 ## Available Services
