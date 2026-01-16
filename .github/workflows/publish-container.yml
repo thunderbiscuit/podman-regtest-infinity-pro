@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       bitcoin_version:
-        description: 'Bitcoin Core version (e.g., 28.1)'
+        description: 'Bitcoin Core version (e.g., 29.2)'
         required: false
         default: '29.2'
       target_arch:
@@ -56,7 +56,7 @@ jobs:
             echo "bitcoin_version=${{ github.event.inputs.bitcoin_version }}" >> $GITHUB_OUTPUT
             echo "target_arch=${{ github.event.inputs.target_arch }}" >> $GITHUB_OUTPUT
           else
-            echo "bitcoin_version=28.1" >> $GITHUB_OUTPUT
+            echo "bitcoin_version=29.2" >> $GITHUB_OUTPUT
             echo "target_arch=x86_64-linux-gnu" >> $GITHUB_OUTPUT
           fi
 
