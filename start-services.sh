@@ -15,7 +15,9 @@ fbbe --network regtest --local-addr 0.0.0.0:3003 > /root/log/fbbe.log 2>&1 &
 # Start the Esplora and Electrum services
 electrs -vvvv --daemon-dir /root/.bitcoin/ --http-addr 0.0.0.0:3002 --electrum-rpc-addr 0.0.0.0:60401 --network=regtest --lightmode --cookie regtest:password > /root/log/esplora.log 2>&1 &
 
-# Mine 101 blocks
-bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password generatetoaddress 101 bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq
+# Create and fund the faucet wallet
+bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password --named createwallet wallet_name="faucet" load_on_startup=true
+FAUCET_ADDRESS=$(bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password --rpcwallet=faucet getnewaddress)
+bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password generatetoaddress 101 $FAUCET_ADDRESS
 
 wait

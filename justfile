@@ -70,7 +70,7 @@ explorer:
 [group("Logs")]
 [doc("Print all logs to console.")]
 logs:
-  podman --connection regtest logs RegtestInfinityPro
+  podman --connection regtest exec -it RegtestInfinityPro tail -f /root/log/bitcoin.log /root/log/fbbe.log /root/log/esplora.log
 
 [group("Logs")]
 [doc("Print bitcoin daemon logs to console.")]
@@ -86,6 +86,16 @@ esploralogs:
 [doc("Print block explorer logs to console.")]
 explorerlogs:
   podman --connection regtest exec -it RegtestInfinityPro tail -f /root/log/fbbe.log
+
+[group("Faucet")]
+[doc("Send bitcoin from the faucet wallet to ADDRESS.")]
+@faucet ADDRESS AMOUNT="1":
+  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet -named sendtoaddress address={{ADDRESS}} amount={{AMOUNT}} fee_rate=4
+
+[group("Faucet")]
+[doc("Print the balance of the faucet wallet.")]
+@faucetbalance:
+  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet getbalance
 
 [group("Default Wallet")]
 [doc("Create a default wallet.")]
