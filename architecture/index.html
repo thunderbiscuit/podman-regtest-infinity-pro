@@ -1,0 +1,1628 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A feature-full bitcoin regtest setup at your fingertips.">
+      
+      
+        <meta name="author" content="thunderbiscuit">
+      
+      
+      
+        <link rel="prev" href="../ci/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.15">
+    
+    
+      
+        <title>Architecture - The Podman Regtest Infinity Pro</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.f1b6466b.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../assets/stylesheets/modern/palette.dfe2e883.min.css">
+      
+      
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+  
+  <style>:root{}</style>
+
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="The Podman Regtest Infinity Pro" class="md-header__button md-logo" aria-label="The Podman Regtest Infinity Pro" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Podman Regtest Infinity Pro
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/thunderbiscuit/podman-regtest-infinity-pro" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    podman-regtest-infinity-pro
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="The Podman Regtest Infinity Pro" class="md-nav__button md-logo" aria-label="The Podman Regtest Infinity Pro" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>
+
+    </a>
+    The Podman Regtest Infinity Pro
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/thunderbiscuit/podman-regtest-infinity-pro" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    podman-regtest-infinity-pro
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#container-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Container Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Services
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Services">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-bitcoin-core-daemon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Bitcoin Core Daemon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-electrum-server-electrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Electrum Server (electrs)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-esplora-server-electrs-http-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Esplora Server (electrs HTTP API)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-fast-bitcoin-block-explorer-fbbe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Fast Bitcoin Block Explorer (fbbe)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#port-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Port Mapping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Port Mapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#android-emulator-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Android Emulator Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distribution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Distribution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#published-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Published Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-versions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Versions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publishing Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benefits-for-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits for CI/CD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Build Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Stages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#startup-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Startup Sequence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimum-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actual-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actual Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Persistence
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Persistence">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#persistent-data-locations-inside-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Persistent Data Locations (inside container)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#network-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Network Isolation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extending-the-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extending the Environment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extending the Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-custom-bitcoin-core-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Custom Bitcoin Core Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-additional-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Additional Services
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#container-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Container Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Services
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Services">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-bitcoin-core-daemon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Bitcoin Core Daemon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-electrum-server-electrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Electrum Server (electrs)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-esplora-server-electrs-http-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Esplora Server (electrs HTTP API)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-fast-bitcoin-block-explorer-fbbe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Fast Bitcoin Block Explorer (fbbe)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#port-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Port Mapping
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Port Mapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#android-emulator-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Android Emulator Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distribution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Distribution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#published-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Published Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-versions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Versions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publishing Workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benefits-for-cicd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits for CI/CD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Process
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Build Process">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-stages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Stages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#startup-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Startup Sequence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimum-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actual-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actual Usage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Persistence
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Persistence">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#persistent-data-locations-inside-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Persistent Data Locations (inside container)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#network-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Network Isolation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security Considerations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extending-the-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extending the Environment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extending the Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-custom-bitcoin-core-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Custom Bitcoin Core Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-additional-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding Additional Services
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+  
+
+
+<h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
+<p>This page provides technical details about how the Podman Regtest Infinity Pro environment is structured and how its components interact.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The environment consists of a single Podman container running multiple Bitcoin-related services that work together to provide a complete regtest development environment. All services run on a Debian Bookworm base image.</p>
+<h2 id="container-architecture">Container Architecture<a class="headerlink" href="#container-architecture" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌───────────────────────────────────────────────────────────────────┐
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│ Podman Container: RegtestInfinityPro                              │
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│                                                                   │
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│  ┌─────────────────────────────────────────────────────────────┐  │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  │ Bitcoin Core Daemon (bitcoind)                              │  │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  │ - Port: 18443 (RPC), 18444 (P2P)                            │  │
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│  │ - username: regtest, password: password                     │  │
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  │ - txindex, blockfilterindex, compact block filters          │  │
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│  └─────────────────────────────────────────────────────────────┘  │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│         │                                                         │
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│         │ (RPC connections)                                       │
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│         ├──────────────┬───────────────┬───────────────┐          │
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│         ▼              ▼               ▼               ▼          │
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐  │
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│  │ Electrum    │ │ Esplora     │ │ Block       │ │ External    │  │
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│  │ Server      │ │ Server      │ │ Explorer    │ │ Tools       │  │
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│  │ (electrs)   │ │ (electrs)   │ │ (fbbe)      │ │ (bitcoin-   │  │
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│  │             │ │             │ │             │ │ cli)        │  │
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│  │ Port: 60401 │ │ Port: 3002  │ │ Port: 3003  │ │             │  │
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘  │
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│                                                                   │
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>└───────────────────────────────────────────────────────────────────┘
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>         │              │              │
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>         │              │              │
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>         ▼              ▼              ▼
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    Your Bitcoin   Your Web     Block Explorer
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>      Wallet       Application    in Browser
+</span></code></pre></div>
+<h2 id="services">Services<a class="headerlink" href="#services" title="Permanent link">&para;</a></h2>
+<h3 id="1-bitcoin-core-daemon">1. Bitcoin Core Daemon<a class="headerlink" href="#1-bitcoin-core-daemon" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose</strong>: The backbone of the environment, running a full Bitcoin node in regtest mode.</p>
+<p><strong>Configuration</strong>:
+- Chain: <code>regtest</code>
+- RPC Port: <code>18443</code>
+- P2P Port: <code>18444</code> (not typically used in regtest)
+- Authentication: Cookie-based
+- Special features:
+  - <code>txindex</code>: Full transaction index for looking up any transaction
+  - <code>blockfilterindex</code>: Indexes for compact block filters
+  - <code>peerblockfilters</code>: Serves compact block filters to peers
+  - REST API enabled</p>
+<p><strong>Location in Container</strong>: <code>/opt/bitcoin-{VERSION}/bin/bitcoind</code></p>
+<p><strong>Data Directory</strong>: <code>/root/.bitcoin/regtest/</code></p>
+<p><strong>Startup</strong>: Automatically started by <code>start-services.sh</code> with output redirected to <code>/root/log/bitcoin.log</code></p>
+<h3 id="2-electrum-server-electrs">2. Electrum Server (electrs)<a class="headerlink" href="#2-electrum-server-electrs" title="Permanent link">&para;</a></h3>
+<p><strong>Configuration</strong>:
+- Port: <code>60401</code> (Electrum RPC)
+- Network: <code>regtest</code>
+- Mode: <code>lightmode</code> (faster indexing for regtest)
+- Daemon directory: <code>/root/.bitcoin/</code></p>
+<p><strong>Repository</strong>: <a href="https://github.com/Blockstream/electrs">Blockstream/electrs</a> (branch: <code>new-index</code>)</p>
+<p><strong>Location in Container</strong>: <code>/root/electrs/target/release/electrs</code></p>
+<p><strong>Startup</strong>: Started by <code>start-services.sh</code> with verbose logging (<code>-vvvv</code>) to <code>/root/log/esplora.log</code></p>
+<p><strong>Use Cases</strong>:
+- Testing Bitcoin wallets that use Electrum protocol
+- SPV wallet development
+- Mobile wallet testing</p>
+<h3 id="3-esplora-server-electrs-http-api">3. Esplora Server (electrs HTTP API)<a class="headerlink" href="#3-esplora-server-electrs-http-api" title="Permanent link">&para;</a></h3>
+<p><strong>Configuration</strong>:
+- Port: <code>3002</code> (HTTP)
+- Network: <code>regtest</code>
+- Mode: <code>lightmode</code></p>
+<p><strong>Repository</strong>: Same as Electrum server (electrs provides both services)</p>
+<p><strong>Startup</strong>: Same process as Electrum server (electrs serves both protocols)</p>
+<p><strong>API Endpoints</strong>:
+- <code>/blocks/tip/height</code> - Get current blockchain height
+- <code>/block/{hash}</code> - Get block by hash
+- <code>/block/{hash}/txs</code> - Get transactions in a block
+- <code>/tx/{txid}</code> - Get transaction details
+- <code>/address/{address}</code> - Get address information
+- <code>/address/{address}/txs</code> - Get address transactions
+- <code>/fee-estimates</code> - Get fee estimates</p>
+<p><strong>Use Cases</strong>:
+- Testing web applications that consume blockchain data
+- Mobile app backend testing
+- Block explorer integration</p>
+<h3 id="4-fast-bitcoin-block-explorer-fbbe">4. Fast Bitcoin Block Explorer (fbbe)<a class="headerlink" href="#4-fast-bitcoin-block-explorer-fbbe" title="Permanent link">&para;</a></h3>
+<p><strong>Configuration</strong>:
+- Port: <code>3003</code>
+- Network: <code>regtest</code>
+- Listen address: <code>0.0.0.0:3003</code></p>
+<p><strong>Repository</strong>: <a href="https://github.com/RCasatta/fbbe">RCasatta/fbbe</a></p>
+<p><strong>Location in Container</strong>: <code>/root/fbbe/target/release/fbbe</code></p>
+<p><strong>Startup</strong>: Started by <code>start-services.sh</code> with output to <code>/root/log/fbbe.log</code></p>
+<p><strong>Use Cases</strong>:
+- Visual inspection of blocks and transactions
+- Debugging transaction issues
+- Verifying confirmations</p>
+<h2 id="port-mapping">Port Mapping<a class="headerlink" href="#port-mapping" title="Permanent link">&para;</a></h2>
+<p>The container exposes the following ports to the host:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Internal Port</th>
+<th>Host Port</th>
+<th>Protocol</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bitcoin Core RPC</td>
+<td>18443</td>
+<td>18443</td>
+<td>HTTP</td>
+<td>RPC commands</td>
+</tr>
+<tr>
+<td>Bitcoin Core P2P</td>
+<td>18444</td>
+<td>18444</td>
+<td>TCP</td>
+<td>P2P network (unused in regtest)</td>
+</tr>
+<tr>
+<td>Esplora API</td>
+<td>3002</td>
+<td>3002</td>
+<td>HTTP</td>
+<td>REST API for blockchain data</td>
+</tr>
+<tr>
+<td>Block Explorer</td>
+<td>3003</td>
+<td>3003</td>
+<td>HTTP</td>
+<td>Web UI for browsing blocks</td>
+</tr>
+<tr>
+<td>Electrum Server</td>
+<td>60401</td>
+<td>60401</td>
+<td>TCP</td>
+<td>Electrum protocol</td>
+</tr>
+</tbody>
+</table>
+<h3 id="android-emulator-access">Android Emulator Access<a class="headerlink" href="#android-emulator-access" title="Permanent link">&para;</a></h3>
+<p>Android emulators can access the container services using the special IP <code>10.0.2.2</code>:
+- Electrum: <code>tcp://10.0.2.2:60401</code>
+- Esplora: <code>http://10.0.2.2:3002</code></p>
+<h2 id="distribution">Distribution<a class="headerlink" href="#distribution" title="Permanent link">&para;</a></h2>
+<p>Pre-built container images are automatically published to GitHub Container Registry (ghcr.io) when new versions are tagged. This allows users to skip the lengthy build process and pull ready-to-use images directly.</p>
+<h3 id="published-images">Published Images<a class="headerlink" href="#published-images" title="Permanent link">&para;</a></h3>
+<p>Images are available at:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:{version}
+</span></code></pre></div></p>
+<h3 id="available-versions">Available Versions<a class="headerlink" href="#available-versions" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>0.3.0</code> - Specific version (full semantic versioning)</li>
+</ul>
+<h3 id="publishing-workflow">Publishing Workflow<a class="headerlink" href="#publishing-workflow" title="Permanent link">&para;</a></h3>
+<p>Images are published automatically via GitHub Actions when tags are pushed:</p>
+<ol>
+<li><strong>Trigger</strong>: Push a tag matching <code>v*</code> (e.g., <code>v1.1.0</code>)</li>
+<li><strong>Build</strong>: GitHub Actions builds the container using Docker Buildx</li>
+<li><strong>Push</strong>: Image is pushed to ghcr.io with the exact version tag</li>
+<li><strong>Cache</strong>: Build cache is stored to speed up subsequent builds</li>
+</ol>
+<p>Manual builds via <code>workflow_dispatch</code> create a <code>test</code> tag for development purposes.</p>
+<p>The workflow uses:
+- Bitcoin Core version: <code>28.1</code> (default)
+- Target architecture: <code>x86_64-linux-gnu</code> (default for CI)</p>
+<p>See <code>.github/workflows/publish-container.yml</code> for the complete workflow configuration.</p>
+<h3 id="benefits-for-cicd">Benefits for CI/CD<a class="headerlink" href="#benefits-for-cicd" title="Permanent link">&para;</a></h3>
+<p>Using pre-built images in continuous integration:
+- <strong>Fast</strong>: Pull in seconds vs 15-30 minute build
+- <strong>Reproducible</strong>: Same image across all environments
+- <strong>Resource-efficient</strong>: Saves CI runner time and compute
+- <strong>Free</strong>: GitHub Container Registry is free for public repos</p>
+<h2 id="build-process">Build Process<a class="headerlink" href="#build-process" title="Permanent link">&para;</a></h2>
+<p>The container is built using the Containerfile with two important build arguments:</p>
+<h3 id="build-arguments">Build Arguments<a class="headerlink" href="#build-arguments" title="Permanent link">&para;</a></h3>
+<p><strong>BITCOIN_VERSION</strong>: Specifies which version of Bitcoin Core to install
+- Examples: <code>28.1</code>, <code>27.0</code>, <code>29.0</code>
+- Downloads from: <code>https://bitcoincore.org/bin/bitcoin-core-{VERSION}/</code></p>
+<p><strong>TARGET_ARCH</strong>: Specifies the architecture of Bitcoin Core binaries
+- Examples: <code>x86_64-linux-gnu</code>, <code>aarch64-linux-gnu</code>, <code>arm64-apple-darwin</code>
+- Must match available builds at bitcoincore.org</p>
+<h3 id="build-stages">Build Stages<a class="headerlink" href="#build-stages" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Base Setup</strong>: Debian Bookworm with wget</li>
+<li><strong>Bitcoin Core Installation</strong>:</li>
+<li>Downloads specified version and architecture</li>
+<li>Extracts to <code>/opt/bitcoin-{VERSION}/</code></li>
+<li>Symlinks binaries to <code>/usr/local/bin/</code></li>
+<li><strong>Dependency Installation</strong>:</li>
+<li>Build tools (curl, git, build-essential)</li>
+<li>Rust toolchain (version 1.75.0)</li>
+<li>OpenSSL and libclang for Rust builds</li>
+<li><strong>Electrs Build</strong>:</li>
+<li>Clones from Blockstream/electrs</li>
+<li>Checks out <code>new-index</code> branch</li>
+<li>Builds in release mode</li>
+<li><strong>FBBE Build</strong>:</li>
+<li>Clones from RCasatta/fbbe</li>
+<li>Builds in release mode with Rust 1.75.0</li>
+<li><strong>Startup Script</strong>: Copies <code>start-services.sh</code> as entrypoint</li>
+</ol>
+<h2 id="startup-sequence">Startup Sequence<a class="headerlink" href="#startup-sequence" title="Permanent link">&para;</a></h2>
+<p>When the container starts, the <code>start-services.sh</code> script executes:</p>
+<ol>
+<li><strong>Create Log Directory</strong> (<code>~/log/</code>)</li>
+<li><strong>Start Bitcoin Core Daemon</strong></li>
+<li>Runs in background with logging to <code>bitcoin.log</code></li>
+<li>Waits 10 seconds for initialization</li>
+<li><strong>Start Block Explorer (fbbe)</strong></li>
+<li>Runs in background with logging to <code>fbbe.log</code></li>
+<li>Waits 10 seconds for initialization</li>
+<li><strong>Start Electrs (Electrum + Esplora)</strong></li>
+<li>Runs in background with logging to <code>esplora.log</code></li>
+<li>Waits 10 seconds for initialization</li>
+<li><strong>Create and Fund Faucet Wallet</strong></li>
+<li>Creates a wallet named <code>faucet</code> with <code>load_on_startup=true</code></li>
+<li>Generates a new address from the faucet wallet</li>
+<li>Mines 101 blocks to the faucet address</li>
+<li>This provides mature coins for instant funding of test wallets</li>
+</ol>
+<h2 id="resource-requirements">Resource Requirements<a class="headerlink" href="#resource-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="minimum-resources">Minimum Resources<a class="headerlink" href="#minimum-resources" title="Permanent link">&para;</a></h3>
+<p>Based on the <code>podman machine init</code> command in the install docs:
+- <strong>CPUs</strong>: 4 cores
+- <strong>Memory</strong>: 4096 MB (4 GB)
+- <strong>Disk</strong>: 20 GB</p>
+<h3 id="actual-usage">Actual Usage<a class="headerlink" href="#actual-usage" title="Permanent link">&para;</a></h3>
+<p>The actual resource usage is typically lower:
+- Bitcoin Core in regtest mode uses minimal resources
+- Electrs indexing is fast in lightmode
+- Total container size after build: ~2-3 GB</p>
+<h2 id="data-persistence">Data Persistence<a class="headerlink" href="#data-persistence" title="Permanent link">&para;</a></h2>
+<p>By default, the container does <strong>not</strong> persist blockchain data between restarts. Each time you stop and start the container, you get a fresh blockchain with 101 blocks and a funded faucet wallet.</p>
+<h3 id="persistent-data-locations-inside-container">Persistent Data Locations (inside container)<a class="headerlink" href="#persistent-data-locations-inside-container" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Bitcoin data: <code>/root/.bitcoin/regtest/</code></li>
+<li>Electrs data: <code>/root/.electrs/</code> (created at runtime)</li>
+<li>Logs: <code>/root/log/</code></li>
+</ul>
+<h2 id="network-isolation">Network Isolation<a class="headerlink" href="#network-isolation" title="Permanent link">&para;</a></h2>
+<p>The container runs on Podman's default network. Services are exposed to the host through port mappings but are not directly accessible from other machines on your network unless you configure additional port forwarding.</p>
+<h2 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h2>
+<p>All services log to <code>/root/log/</code> inside the container:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Log File</th>
+<th>Access Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bitcoin Core</td>
+<td><code>bitcoin.log</code></td>
+<td><code>just bitcoindlogs</code></td>
+</tr>
+<tr>
+<td>Electrs (Esplora + Electrum)</td>
+<td><code>esplora.log</code></td>
+<td><code>just esploralogs</code></td>
+</tr>
+<tr>
+<td>Block Explorer</td>
+<td><code>fbbe.log</code></td>
+<td><code>just explorerlogs</code></td>
+</tr>
+<tr>
+<td>All services</td>
+<td>All files</td>
+<td><code>just logs</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-considerations">Security Considerations<a class="headerlink" href="#security-considerations" title="Permanent link">&para;</a></h2>
+<p>This environment is designed for <strong>local development only</strong>:</p>
+<ul>
+<li>Services bind to <code>0.0.0.0</code> inside the container (all interfaces)</li>
+<li>No authentication on Electrum/Esplora/Explorer services</li>
+<li>Cookie file is world-readable inside the container</li>
+<li>Not suitable for production or public exposure</li>
+<li>Do not use real Bitcoin private keys or mainnet data</li>
+</ul>
+<h2 id="extending-the-environment">Extending the Environment<a class="headerlink" href="#extending-the-environment" title="Permanent link">&para;</a></h2>
+<h3 id="adding-custom-bitcoin-core-configuration">Adding Custom Bitcoin Core Configuration<a class="headerlink" href="#adding-custom-bitcoin-core-configuration" title="Permanent link">&para;</a></h3>
+<p>Edit the <code>start-services.sh</code> script to add flags to the <code>bitcoind</code> command:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>bitcoind<span class="w"> </span>--chain<span class="o">=</span>regtest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>--txindex<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--blockfilterindex<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>--peerblockfilters<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span>--rpcbind<span class="o">=</span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span>--rpcallowip<span class="o">=</span><span class="m">0</span>.0.0.0/0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span>--rpcport<span class="o">=</span><span class="m">18443</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span>--rest<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span>--printtoconsole<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span>--maxmempool<span class="o">=</span><span class="m">50</span><span class="w"> </span><span class="se">\ </span><span class="w"> </span><span class="c1"># Add custom options</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span>&gt;<span class="w"> </span>~/log/bitcoin.log<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span>
+</span></code></pre></div>
+<h3 id="adding-additional-services">Adding Additional Services<a class="headerlink" href="#adding-additional-services" title="Permanent link">&para;</a></h3>
+<p>You can modify the Containerfile to install additional tools:</p>
+<ol>
+<li>Install dependencies in the <code>RUN apt-get install</code> section</li>
+<li>Build/install your service</li>
+<li>Add startup commands to <code>start-services.sh</code></li>
+<li>Expose additional ports in the container create command</li>
+</ol>
+<h3 id="version-updates">Version Updates<a class="headerlink" href="#version-updates" title="Permanent link">&para;</a></h3>
+<p>To use a different Bitcoin Core version:</p>
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Rebuild with different version</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>podman<span class="w"> </span>--connection<span class="w"> </span>regtest<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>--build-arg<span class="w"> </span><span class="nv">BITCOIN_VERSION</span><span class="o">=</span><span class="m">27</span>.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>--build-arg<span class="w"> </span><span class="nv">TARGET_ARCH</span><span class="o">=</span>x86_64-linux-gnu<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span>--tag<span class="w"> </span>localhost/regtest:v0.1.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span>--file<span class="w"> </span>./Containerfile
+</span></code></pre></div>
+<p>Then recreate the container with the new image.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-circle-arrow-up" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":["announce.dismiss","content.code.annotate","content.code.copy","content.code.select","content.footnote.tooltips","content.tabs.link","content.tooltips","navigation.indexes","navigation.instant","navigation.instant.prefetch","navigation.path","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.00c35305.min.js"></script>
+      
+    
+  </body>
+</html>
