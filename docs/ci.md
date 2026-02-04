@@ -85,7 +85,7 @@ Once the container is running, the following services are available:
 The container starts with:
 - Bitcoin Core running in regtest mode
 - Username: `regtest`, password: `password`
-- 3 blocks pre-mined on startup
+- Faucet wallet with 101 blocks pre-mined (mature coins ready to spend)
 - Compact block filters enabled
 - All services started automatically
 

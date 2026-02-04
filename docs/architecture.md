@@ -229,10 +229,11 @@ When the container starts, the `start-services.sh` script executes:
 4. **Start Electrs (Electrum + Esplora)**
    - Runs in background with logging to `esplora.log`
    - Waits 10 seconds for initialization
-5. **Mine Initial Blocks**
-   - Extracts authentication cookie
-   - Mines 3 blocks to address `bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq`
-   - This initializes the blockchain and allows services to sync
+5. **Create and Fund Faucet Wallet**
+   - Creates a wallet named `faucet` with `load_on_startup=true`
+   - Generates a new address from the faucet wallet
+   - Mines 101 blocks to the faucet address
+   - This provides mature coins for instant funding of test wallets
 
 ## Resource Requirements
 
@@ -252,7 +253,7 @@ The actual resource usage is typically lower:
 
 ## Data Persistence
 
-By default, the container does **not** persist blockchain data between restarts. Each time you stop and start the container, you get a fresh blockchain with 3 blocks.
+By default, the container does **not** persist blockchain data between restarts. Each time you stop and start the container, you get a fresh blockchain with 101 blocks and a funded faucet wallet.
 
 ### Persistent Data Locations (inside container)
 

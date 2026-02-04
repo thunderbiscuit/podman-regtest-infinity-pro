@@ -75,6 +75,10 @@ Available recipes:
     esploralogs    # Print Esplora logs to console
     explorerlogs   # Print block explorer logs to console
 
+    [Faucet]
+    faucet         # Send bitcoin from the faucet wallet to ADDRESS
+    faucetbalance  # Print the balance of the faucet wallet
+
     [Default Wallet]
     createwallet   # Create a default wallet
     loadwallet     # Load the default wallet
@@ -89,17 +93,17 @@ Available recipes:
 # Start the container
 just start
 
-# Mine some blocks
-just mine 101
-
 # Create a wallet
 just createwallet
 
 # Get a new address
-just newaddress
+ADDRESS=$(just newaddress)
 
-# Mine to that address
-just mineandsendrewardto bcrt1q...
+# Get funds from the faucet (already has mature coins)
+just faucet $ADDRESS 5
+
+# Mine a block to confirm the transaction
+just mine 1
 
 # Check balance
 just walletbalance

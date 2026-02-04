@@ -18,7 +18,7 @@ Once started, the container runs four services automatically:
 - Esplora server (listening on port `3002`)
 - Fast Bitcoin Block Explorer (listening on port `3003`)
 
-The container also automatically mines 3 initial blocks on startup to get the blockchain going.
+The container also automatically creates a faucet wallet and mines 101 blocks to it on startup. This provides mature coins that can be instantly sent to any address without needing to mine additional blocks for coinbase maturity.
 
 ## Quick Start Tutorial
 
@@ -31,19 +31,22 @@ just start
 # Create a wallet
 just createwallet
 
-# Mine some blocks (need 101 blocks for coinbase maturity)
-just mine 101
-
 # Get a new address
 just newaddress
 # Output: bcrt1qxy2kgd...
 
-# Send bitcoin to another address
-just sendto bcrt1qtest...
+# Get funds from the faucet (already has mature coins)
+just faucet bcrt1qxy2kgd... 5
+
+# Mine a block to confirm the faucet transaction
+just mine 1
 
 # Check your wallet balance
 just walletbalance
-# Output: 0.12345678
+# Output: 5.00000000
+
+# Send bitcoin to another address
+just sendto bcrt1qtest...
 
 # Mine a block to confirm the transaction
 just mine 1
@@ -82,6 +85,10 @@ Available recipes:
     [Docs]
     servedocs                  # Serve the local docs.
     docs                       # Open the website for docs.
+
+    [Faucet]
+    faucet ADDRESS AMOUNT="1"  # Send bitcoin from the faucet wallet to ADDRESS.
+    faucetbalance              # Print the balance of the faucet wallet.
 
     [Default Wallet]
     createwallet               # Create a default wallet.
@@ -170,6 +177,41 @@ just cli getblockhash 1
 just cli getblock <blockhash>
 ```
 
+## Using the Faucet Wallet
+
+The container automatically creates a `faucet` wallet on startup with mature coins ready to spend. This is the recommended way to fund your test wallets.
+
+### Why Use the Faucet?
+
+Mining blocks to get coins requires waiting for coinbase maturity (100 blocks). The faucet wallet already has mature coins from startup, so you can get funds instantly with just one confirmation block.
+
+**Without faucet (slow):**
+```shell
+just mineandsendrewardto <your-address>
+just mine 100  # Wait for coinbase maturity
+```
+
+**With faucet (fast):**
+```shell
+just faucet <your-address> 5
+just mine 1  # Just confirm the transaction
+```
+
+### Faucet Commands
+
+```shell
+# Send 1 BTC (default) to an address
+just faucet bcrt1qxy2kgd...
+
+# Send a specific amount
+just faucet bcrt1qxy2kgd... 10
+
+# Check faucet balance
+just faucetbalance
+```
+
+The faucet starts with approximately 50 BTC of spendable coins from the initial 101 mined blocks.
+
 ## Working with the Default Wallet
 
 The environment supports creating and using a default wallet called `podmanwallet`.
@@ -210,8 +252,11 @@ just createwallet
 ADDRESS=$(just newaddress)
 echo "Address: $ADDRESS"
 
-# Mine 1 block to a given address
-just mineandsendrewardto $ADDRESS
+# Get funds from the faucet (coins are already mature, no need to mine 101 blocks)
+just faucet $ADDRESS 10
+
+# Mine a block to confirm the faucet transaction
+just mine 1
 
 # Check balance
 just walletbalance

@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-rm -rf ./site/*
+rm -rf .cache/
+rm -rf site/
 just builddocs
 cd ./site/
 git init .
