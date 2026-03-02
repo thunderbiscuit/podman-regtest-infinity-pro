@@ -32,15 +32,25 @@ servedocs:
 [group("Pod")]
 [doc("Start your podman machine and regtest environment.")]
 start:
-  podman machine start regtest
-  podman --connection regtest start RegtestInfinityPro
+  #!/usr/bin/env bash
+  if podman machine inspect regtest | jq --exit-status '.[0].State == "stopped"' > /dev/null; then
+    podman machine start regtest
+    podman --connection regtest start RegtestInfinityPro
+  else
+    echo "Machine is already running..."
+  fi
 
 [group("Pod")]
 [doc("Stop your podman machine and regtest environment.")]
 stop:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password stop
-  podman --connection regtest stop RegtestInfinityPro
-  podman machine stop regtest
+  #!/usr/bin/env bash
+  if podman machine inspect regtest | jq --exit-status '.[0].State == "running"' > /dev/null; then
+    bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password stop
+    podman --connection regtest stop RegtestInfinityPro
+    podman machine stop regtest
+  else
+    echo "Machinne is already stopped..."
+  fi
 
 [group("Pod")]
 [doc("Enter the shell in the pod.")]
