@@ -53,6 +53,23 @@ stop:
   fi
 
 [group("Pod")]
+[doc("Reset the regtest network to a fresh state (wipes all blocks and wallets).")]
+reset:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "Stopping the Bitcoin daemon..."
+  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password stop || true
+  echo "Waiting for the daemon to shut down..."
+  until ! bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password getblockchaininfo > /dev/null 2>&1; do
+    sleep 1
+  done
+  echo "Deleting the regtest chain data and the Esplora/Electrum index..."
+  podman --connection regtest exec RegtestInfinityPro rm -rf /root/.bitcoin/regtest /db/regtest
+  echo "Restarting the container to bootstrap a fresh network..."
+  podman --connection regtest restart RegtestInfinityPro
+  echo "Done. A fresh regtest network is bootstrapping."
+
+[group("Pod")]
 [doc("Enter the shell in the pod.")]
 podshell:
   podman --connection regtest exec -it RegtestInfinityPro /bin/bash
