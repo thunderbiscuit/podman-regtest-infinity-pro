@@ -94,6 +94,11 @@ explorer:
 @cli COMMAND:
   bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password {{COMMAND}}
 
+[group("Bitcoin Core")]
+[doc("Print the height of the blockchain.")]
+@height:
+  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password getblockcount
+
 [group("Logs")]
 [doc("Print all logs to console.")]
 logs:
