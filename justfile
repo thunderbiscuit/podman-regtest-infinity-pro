@@ -12,12 +12,26 @@ repo:
 
 [group("Docs")]
 [doc("List the available services and their endpoints.")]
-@services:
+services:
+  #!/usr/bin/env bash
+  LAN_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1)
+  echo ""
+  echo "--- Accessible from this machine -------------------------------"
   echo "Electrum server:                       tcp://127.0.0.1:60401"
   echo "Esplora server:                        http://127.0.0.1:3002"
   echo "Electrum server (Android emulators):   tcp://10.0.2.2:60401"
   echo "Esplora server  (Android emulators):   http://10.0.2.2:3002"
   echo "Fast Bitcoin Block Explorer:           http://127.0.0.1:3003"
+  echo ""
+  echo "--- Accessible from your local network -------------------------"
+  echo "Bitcoin Core P2P:                      tcp://$LAN_IP:18444"
+  echo "Electrum server:                       tcp://$LAN_IP:60401"
+  echo "Esplora server:                        http://$LAN_IP:3002"
+  echo "Fast Bitcoin Block Explorer:           http://$LAN_IP:3003"
+  echo ""
+  echo "--- Open the block explorer on your phone ----------------------"
+  echo ""
+  qrencode -t ansiutf8 "http://$LAN_IP:3003"
 
 [group("Docs")]
 [doc("Build the local docs.")]

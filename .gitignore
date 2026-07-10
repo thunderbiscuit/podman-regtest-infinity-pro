@@ -3,3 +3,4 @@ site/
 .cache/
 NOTES.md
 justfile.local
+todo.txt
