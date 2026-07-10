@@ -34,8 +34,8 @@ Get into the container's directory and build the container. Note that you must s
 ```shell
 cd podman-regtest-infinity-pro/
 podman machine start regtest
-podman --connection regtest build --build-arg BITCOIN_VERSION=29.2 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest-infinity-pro:0.3.0 --file ./Containerfile
-podman --connection regtest create --name RegtestInfinityPro --publish 0.0.0.0:18443:18443 --publish 0.0.0.0:18444:18444 --publish 0.0.0.0:3002:3002 --publish 0.0.0.0:3003:3003 --publish 0.0.0.0:60401:60401 localhost/regtest-infinity-pro:0.3.0
+podman --connection regtest build --build-arg BITCOIN_VERSION=29.2 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest-infinity-pro:0.4.0 --file ./Containerfile
+podman --connection regtest create --name RegtestInfinityPro --publish 0.0.0.0:18443:18443 --publish 0.0.0.0:18444:18444 --publish 0.0.0.0:3002:3002 --publish 0.0.0.0:3003:3003 --publish 0.0.0.0:60401:60401 localhost/regtest-infinity-pro:0.4.0
 
 # Delete all intermediate images not required by the machine anymore
 podman --connection regtest image prune -a

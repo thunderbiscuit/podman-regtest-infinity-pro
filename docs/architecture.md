@@ -154,7 +154,7 @@ ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:{version}
 
 ### Available Versions
 
-- `0.3.0` - Specific version (full semantic versioning)
+- `0.4.0` - Specific version (full semantic versioning)
 
 ### Publishing Workflow
 

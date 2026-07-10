@@ -6,7 +6,7 @@ This guide shows how to use the pre-built images for local development and testi
 
 ```bash
 # Pull the image
-docker pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
+docker pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.4.0
 
 # Create the container
 docker create --name RegtestInfinityPro \
@@ -15,7 +15,7 @@ docker create --name RegtestInfinityPro \
   --publish 0.0.0.0:3002:3002 \
   --publish 0.0.0.0:3003:3003 \
   --publish 0.0.0.0:60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.4.0
 
 # Start the container
 docker start RegtestInfinityPro
@@ -145,7 +145,7 @@ docker create --name RegtestInfinityPro \
   --publish 0.0.0.0:3002:3002 \
   --publish 0.0.0.0:3003:3003 \
   --publish 0.0.0.0:60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.4.0
 docker start RegtestInfinityPro
 ```
 
@@ -165,7 +165,7 @@ docker create --name RegtestInfinityPro \
   --publish 0.0.0.0:3003:3003 \
   --publish 0.0.0.0:60401:60401 \
   --volume bitcoin-regtest-data:/root/.bitcoin \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.4.0
 ```
 
 ## Troubleshooting
@@ -197,7 +197,7 @@ docker create --name RegtestInfinityPro \
   --publish 0.0.0.0:13002:3002 \
   --publish 0.0.0.0:13003:3003 \
   --publish 0.0.0.0:50401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.4.0
 ```
 
 ### Container Won't Start
@@ -213,13 +213,13 @@ docker logs RegtestInfinityPro
 The image works with Podman too - just replace `docker` with `podman`:
 
 ```bash
-podman pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
+podman pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.4.0
 podman create --name RegtestInfinityPro \
   --publish 0.0.0.0:18443:18443 \
   --publish 0.0.0.0:18444:18444 \
   --publish 0.0.0.0:3002:3002 \
   --publish 0.0.0.0:3003:3003 \
   --publish 0.0.0.0:60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.4.0
 podman start RegtestInfinityPro
 ```
