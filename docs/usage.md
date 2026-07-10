@@ -18,7 +18,9 @@ Once started, the container runs four services automatically:
 - Esplora server (listening on port `3002`)
 - Fast Bitcoin Block Explorer (listening on port `3003`)
 
-The container also automatically creates a faucet wallet and mines 101 blocks to it on startup. This provides mature coins that can be instantly sent to any address without needing to mine additional blocks for coinbase maturity.
+On the very first start (or after a `just reset`), the container automatically creates a faucet wallet and mines 101 blocks to it. This provides mature coins that can be instantly sent to any address without needing to mine additional blocks for coinbase maturity.
+
+The blockchain persists across stops and starts: your blocks, wallets, and transactions are still there the next time you run `just start` (each start simply mines one additional block to the faucet). If you ever want to start over from a clean slate, use `just reset` — it wipes the chain data and the Esplora/Electrum index, then bootstraps a fresh network with a newly funded faucet.
 
 ## Quick Start Tutorial
 
@@ -28,28 +30,18 @@ Here's a complete workflow to get you started:
 # Start the environment
 just start
 
-# Create a wallet
-just createwallet
-
-# Get a new address
-just newaddress
-# Output: bcrt1qxy2kgd...
-
-# Get funds from the faucet (already has mature coins)
+# Send funds from the faucet to any address (e.g. your wallet app under test)
 just faucet bcrt1qxy2kgd... 5
 
 # Mine a block to confirm the faucet transaction
 just mine 1
 
-# Check your wallet balance
-just walletbalance
-# Output: 5.00000000
+# Need an address to send coins back to? Get one from the faucet wallet
+just newaddress
+# Output: bcrt1qtest...
 
-# Send bitcoin to another address
-just sendto bcrt1qtest...
-
-# Mine a block to confirm the transaction
-just mine 1
+# Check the faucet balance
+just faucetbalance
 
 # View the block explorer
 just explorer
@@ -62,40 +54,34 @@ List all available commands:
 ```shell
 $ just
 Available recipes:
-    [Podman]
-    default                    # List all available commands.
-    services                   # List the available services and their endpoints.
-    start                      # Start your podman machine and regtest environment.
-    stop                       # Stop your podman machine and regtest environment.
-    podshell                   # Enter the shell in the pod.
-    explorer                   # Open the block explorer.
+    [Repo]
+    default                            # List all available commands.
+    repo                               # Open repository on GitHub.
+
+    [Pod]
+    services                           # List the available services and their endpoints.
+    start                              # Start your podman machine and regtest environment.
+    stop                               # Stop your podman machine and regtest environment.
+    reset                              # Reset the regtest network to a fresh state (wipes all blocks and wallets).
+    podshell                           # Enter the shell in the pod.
+    explorer                           # Open the block explorer.
 
     [Bitcoin Core]
-    cookie                     # Print the current session cookie to console.
-    mine BLOCKS="1"            # Mine a block, or mine <BLOCKS> number of blocks.
-    sendminingrewardto ADDRESS # Send mining reward to <ADDRESS>
-    cli COMMAND                # Send a command to bitcoin-cli
+    mine BLOCKS="1"                    # Mine a block, or mine <BLOCKS> number of blocks.
+    mineandsendrewardto ADDRESS        # Send mining reward to <ADDRESS>.
+    cli COMMAND                        # Send a command to bitcoin-cli.
+    height                             # Print the height of the blockchain.
 
     [Logs]
-    logs                       # Print all logs to console.
-    bitcoindlogs               # Print bitcoin daemon logs to console.
-    esploralogs                # Print Esplora logs to console.
-    explorerlogs               # Print block explorer logs to console.
-
-    [Docs]
-    servedocs                  # Serve the local docs.
-    docs                       # Open the website for docs.
+    logs                               # Print all logs to console.
+    bitcoindlogs                       # Print bitcoin daemon logs to console.
+    esploralogs                        # Print Esplora logs to console.
+    explorerlogs                       # Print block explorer logs to console.
 
     [Faucet]
-    faucet ADDRESS AMOUNT="1"  # Send bitcoin from the faucet wallet to ADDRESS.
-    faucetbalance              # Print the balance of the faucet wallet.
-
-    [Default Wallet]
-    createwallet               # Create a default wallet.
-    loadwallet                 # Load the default wallet.
-    newaddress                 # Print an address from the default wallet.
-    walletbalance              # Print the balance of the default wallet.
-    sendto ADDRESS             # Send 1 bitcoin to ADDRESS using the default wallet.
+    faucet ADDRESS AMOUNT="0.12345678" # Send bitcoin from the faucet wallet to ADDRESS.
+    faucetbalance                      # Print the balance of the faucet wallet.
+    newaddress                         # Print a new address from the faucet wallet.
 ```
 
 ## Container Management
@@ -115,12 +101,34 @@ just services
 
 Example output from `just services`:
 ```
+--- Accessible from this machine -------------------------------
 Electrum server:                       tcp://127.0.0.1:60401
 Esplora server:                        http://127.0.0.1:3002
 Electrum server (Android emulators):   tcp://10.0.2.2:60401
 Esplora server  (Android emulators):   http://10.0.2.2:3002
 Fast Bitcoin Block Explorer:           http://127.0.0.1:3003
+
+--- Accessible from your local network -------------------------
+Bitcoin Core P2P:                      tcp://192.168.1.42:18444
+Electrum server:                       tcp://192.168.1.42:60401
+Esplora server:                        http://192.168.1.42:3002
+Fast Bitcoin Block Explorer:           http://192.168.1.42:3003
+
+--- Open the block explorer on your phone ----------------------
+[QR code]
 ```
+
+The command finishes by printing a QR code you can scan with your phone to open the block explorer directly (this requires [qrencode](https://github.com/fukuchi/libqrencode), available with `brew install qrencode`). See [Local Network Access](#local-network-access) for more on connecting from other devices.
+
+### Resetting the Network
+
+The blockchain persists across container stops and starts. To wipe everything and bootstrap a fresh network (new chain, new faucet wallet, 101 freshly mined blocks):
+
+```shell
+just reset
+```
+
+This deletes the chain data and the Esplora/Electrum index inside the container, then restarts it. Any wallets you created are deleted as well.
 
 ### Accessing the Container
 
@@ -145,6 +153,9 @@ just mine 10
 
 # Mine a block and send the reward to a specific address
 just mineandsendrewardto bcrt1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+
+# Check the current height of the blockchain
+just height
 ```
 
 ### Using bitcoin-cli Commands
@@ -164,8 +175,8 @@ just cli listwallets
 # Get mempool information
 just cli getmempoolinfo
 
-# Get a new address (requires wallet to be loaded)
-just cli -rpcwallet=podmanwallet getnewaddress
+# Get a new address from the faucet wallet
+just cli "-rpcwallet=faucet getnewaddress"
 
 # Send a raw transaction
 just cli sendrawtransaction <hex>
@@ -200,7 +211,7 @@ just mine 1  # Just confirm the transaction
 ### Faucet Commands
 
 ```shell
-# Send 1 BTC (default) to an address
+# Send the default amount (0.12345678 BTC) to an address
 just faucet bcrt1qxy2kgd...
 
 # Send a specific amount
@@ -208,64 +219,43 @@ just faucet bcrt1qxy2kgd... 10
 
 # Check faucet balance
 just faucetbalance
-```
 
-The faucet starts with approximately 50 BTC of spendable coins from the initial 101 mined blocks.
-
-## Working with the Default Wallet
-
-The environment supports creating and using a default wallet called `podmanwallet`.
-
-### Wallet Setup
-
-```shell
-# Create the default wallet (only needed once)
-just createwallet
-
-# Load the wallet (if it already exists)
-just loadwallet
-```
-
-### Wallet Operations
-
-```shell
-# Generate a new receiving address
+# Get a new address from the faucet wallet
+# (e.g. as a target when testing sends from your own wallet app)
 just newaddress
 # Example output: bcrt1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
-
-# Check wallet balance
-just walletbalance
-# Example output: 50.00000000
-
-# Send 0.12345678 BTC to an address
-just sendto bcrt1qtest...
-# Note: The sendto command sends 0.12345678 BTC with a fee rate of 4 sat/vB
 ```
 
-### Complete Wallet Workflow Example
+The faucet starts with approximately 50 BTC of spendable coins from the initial 101 mined blocks. Coins sent to a `just newaddress` address go back into the faucet, topping it up.
+
+### Complete Workflow Example
+
+Testing a wallet application end to end:
 
 ```shell
-# Create and load wallet
-just createwallet
-
-# Generate an address
-ADDRESS=$(just newaddress)
-echo "Address: $ADDRESS"
-
-# Get funds from the faucet (coins are already mature, no need to mine 101 blocks)
-just faucet $ADDRESS 10
+# Fund your application's wallet (coins are already mature, no need to mine 101 blocks)
+just faucet <your-app-address> 10
 
 # Mine a block to confirm the faucet transaction
 just mine 1
 
-# Check balance
-just walletbalance
+# Get an address to test sending funds back
+ADDRESS=$(just newaddress)
+echo "Address: $ADDRESS"
 
-# Send funds somewhere else
-just sendto bcrt1qrecipient...
+# ... send from your application to $ADDRESS ...
 
 # Mine a block to confirm
 just mine 1
+```
+
+### Need a Second Wallet?
+
+The faucet is the only wallet the environment manages for you. If you want an additional node wallet — for example to simulate a second party with its own balance — create one directly with bitcoin-cli:
+
+```shell
+just cli "createwallet mywallet"
+just cli "-rpcwallet=mywallet getnewaddress"
 ```
 
 ## Viewing Logs
@@ -342,21 +332,37 @@ For Android emulators, use:
 http://10.0.2.2:3002
 ```
 
+## Local Network Access
+
+The services are reachable from other devices on your local network out of the box — no extra configuration needed. The `--publish` flags used when creating the container bind the ports on all of the host's interfaces, so a phone or laptop on the same Wi-Fi can connect using your machine's LAN IP address (for example `192.168.1.42` below).
+
+This is particularly useful for testing mobile apps on real hardware instead of an emulator:
+
+- **Compact block filter (BIP-157/158) clients** can use the node as a peer at `192.168.1.42:18444`. The node runs with `blockfilterindex` and `peerblockfilters`, so it serves filters to any CBF wallet that connects.
+- **Electrum wallets** can connect to `tcp://192.168.1.42:60401`.
+- **Esplora-based apps** can use `http://192.168.1.42:3002`.
+- **The block explorer** is at `http://192.168.1.42:3003` in any browser on the network.
+
+Run `just services` to see all endpoints with your actual LAN IP filled in, along with a QR code that opens the block explorer on your phone.
+
+!!! warning "Untrusted networks"
+    These ports are open to *every* device on whatever network your machine is connected to — including the RPC port (18443), which uses well-known credentials and gives full control of the node. That's harmless on your home network with a valueless regtest chain, but on public Wi-Fi (café, conference) consider stopping the environment with `just stop` while you're connected, or enabling your operating system's firewall. You can also restrict individual ports to your own machine by publishing them on the loopback interface when creating the container (e.g. `--publish 127.0.0.1:18443:18443` instead of `--publish 0.0.0.0:18443:18443`) — the RPC port is the best candidate, since none of the phone-facing services need it.
+
+Two things that can get in the way of connecting from another device: some networks (typically office or guest Wi-Fi) enable *client isolation*, which blocks devices from talking to each other; and your machine's firewall may need to allow incoming connections for podman's `gvproxy` process.
+
 ## Advanced Usage
 
-### Getting the Authentication Cookie
+### RPC Authentication
 
-Bitcoin Core uses cookie authentication. To get the current session cookie:
-
-```shell
-just cookie
-```
-
-You can use this cookie to authenticate RPC calls from outside the container:
+Bitcoin Core runs with static RPC credentials: username `regtest`, password `password`. All the `just` commands use these under the hood, and you can use them directly from any RPC client:
 
 ```shell
-COOKIE=$(just cookie)
-bitcoin-cli --chain=regtest --rpcuser=__cookie__ --rpcpassword=$COOKIE getblockchaininfo
+bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password getblockchaininfo
+
+# Or over raw HTTP
+curl --user regtest:password \
+  --data-binary '{"jsonrpc":"1.0","id":"test","method":"getblockchaininfo","params":[]}' \
+  -H 'content-type: text/plain;' http://127.0.0.1:18443/
 ```
 
 ### Custom bitcoin-cli Commands
@@ -399,7 +405,5 @@ Then add your custom commands to `justfile.local`. For example:
     echo "✗ Container not running"
   fi
 ```
-
-**Important:** In justfiles, Go template syntax like `{{.Names}}` must be escaped by doubling the braces: `{{{{.Names}}}}`. This tells `just` to treat them as literal braces rather than variable interpolation.
 
 The main `justfile` already imports `justfile.local` (if it exists), so all your custom commands will appear when you run `just --list`.

@@ -47,15 +47,15 @@ The environment consists of a single Podman container running multiple Bitcoin-r
 **Configuration**:
 - Chain: `regtest`
 - RPC Port: `18443`
-- P2P Port: `18444` (not typically used in regtest)
-- Authentication: Cookie-based
+- P2P Port: `18444` (used by compact block filter clients connecting as peers)
+- Authentication: static RPC credentials (username `regtest`, password `password`)
 - Special features:
   - `txindex`: Full transaction index for looking up any transaction
   - `blockfilterindex`: Indexes for compact block filters
   - `peerblockfilters`: Serves compact block filters to peers
   - REST API enabled
 
-**Location in Container**: `/opt/bitcoin-{VERSION}/bin/bitcoind`
+**Location in Container**: `/usr/local/bin/bitcoind`
 
 **Data Directory**: `/root/.bitcoin/regtest/`
 
@@ -69,9 +69,9 @@ The environment consists of a single Podman container running multiple Bitcoin-r
 - Mode: `lightmode` (faster indexing for regtest)
 - Daemon directory: `/root/.bitcoin/`
 
-**Repository**: [Blockstream/electrs](https://github.com/Blockstream/electrs) (branch: `new-index`)
+**Repository**: [Blockstream/electrs](https://github.com/Blockstream/electrs) (pinned to a specific commit of the `new-index` branch in the Containerfile)
 
-**Location in Container**: `/root/electrs/target/release/electrs`
+**Location in Container**: `/usr/local/bin/electrs`
 
 **Startup**: Started by `start-services.sh` with verbose logging (`-vvvv`) to `/root/log/esplora.log`
 
@@ -112,9 +112,9 @@ The environment consists of a single Podman container running multiple Bitcoin-r
 - Network: `regtest`
 - Listen address: `0.0.0.0:3003`
 
-**Repository**: [RCasatta/fbbe](https://github.com/RCasatta/fbbe)
+**Repository**: [RCasatta/fbbe](https://github.com/RCasatta/fbbe) (pinned to a specific commit in the Containerfile)
 
-**Location in Container**: `/root/fbbe/target/release/fbbe`
+**Location in Container**: `/usr/local/bin/fbbe`
 
 **Startup**: Started by `start-services.sh` with output to `/root/log/fbbe.log`
 
@@ -130,7 +130,7 @@ The container exposes the following ports to the host:
 | Service          | Internal Port | Host Port | Protocol | Purpose                         |
 |------------------|---------------|-----------|----------|---------------------------------|
 | Bitcoin Core RPC | 18443         | 18443     | HTTP     | RPC commands                    |
-| Bitcoin Core P2P | 18444         | 18444     | TCP      | P2P network (unused in regtest) |
+| Bitcoin Core P2P | 18444         | 18444     | TCP      | P2P network (serves compact block filters to peers) |
 | Esplora API      | 3002          | 3002      | HTTP     | REST API for blockchain data    |
 | Block Explorer   | 3003          | 3003      | HTTP     | Web UI for browsing blocks      |
 | Electrum Server  | 60401         | 60401     | TCP      | Electrum protocol               |
@@ -168,7 +168,7 @@ Images are published automatically via GitHub Actions when tags are pushed:
 Manual builds via `workflow_dispatch` create a `test` tag for development purposes.
 
 The workflow uses:
-- Bitcoin Core version: `28.1` (default)
+- Bitcoin Core version: `29.2` (default)
 - Target architecture: `x86_64-linux-gnu` (default for CI)
 
 See `.github/workflows/publish-container.yml` for the complete workflow configuration.
@@ -197,43 +197,37 @@ The container is built using the Containerfile with two important build argument
 
 ### Build Stages
 
-1. **Base Setup**: Debian Bookworm with wget
-2. **Bitcoin Core Installation**:
-   - Downloads specified version and architecture
-   - Extracts to `/opt/bitcoin-{VERSION}/`
-   - Symlinks binaries to `/usr/local/bin/`
-3. **Dependency Installation**:
-   - Build tools (curl, git, build-essential)
-   - Rust toolchain (version 1.75.0)
-   - OpenSSL and libclang for Rust builds
-4. **Electrs Build**:
-   - Clones from Blockstream/electrs
-   - Checks out `new-index` branch
-   - Builds in release mode
-5. **FBBE Build**:
-   - Clones from RCasatta/fbbe
-   - Builds in release mode with Rust 1.75.0
-6. **Startup Script**: Copies `start-services.sh` as entrypoint
+The Containerfile uses a two-stage build to keep the final image small:
+
+**Builder stage** (Debian Bookworm):
+
+1. Installs build dependencies (wget, curl, git, build-essential, OpenSSL and libclang headers)
+2. Downloads the specified Bitcoin Core version and architecture from bitcoincore.org and extracts it to `/opt/bitcoin-{VERSION}/`
+3. Installs the Rust toolchain (version 1.92.0)
+4. Clones and builds electrs (Blockstream fork, pinned to a specific commit of the `new-index` branch) in release mode
+5. Clones and builds fbbe (pinned to a specific commit) in release mode
+
+**Runtime stage** (Debian Bookworm slim):
+
+1. Installs only runtime dependencies (libssl3, netcat)
+2. Copies the Bitcoin Core, electrs, and fbbe binaries from the builder stage into `/usr/local/bin/`
+3. Copies `start-services.sh` as the entrypoint
+
+Build tools, source trees, and intermediate artifacts stay in the builder stage and are not part of the final image.
 
 ## Startup Sequence
 
 When the container starts, the `start-services.sh` script executes:
 
-1. **Create Log Directory** (`~/log/`)
+1. **Create Log Directory** (`/root/log/`)
 2. **Start Bitcoin Core Daemon**
    - Runs in background with logging to `bitcoin.log`
-   - Waits 10 seconds for initialization
-3. **Start Block Explorer (fbbe)**
-   - Runs in background with logging to `fbbe.log`
-   - Waits 10 seconds for initialization
-4. **Start Electrs (Electrum + Esplora)**
-   - Runs in background with logging to `esplora.log`
-   - Waits 10 seconds for initialization
-5. **Create and Fund Faucet Wallet**
-   - Creates a wallet named `faucet` with `load_on_startup=true`
-   - Generates a new address from the faucet wallet
-   - Mines 101 blocks to the faucet address
-   - This provides mature coins for instant funding of test wallets
+   - The script polls `getblockchaininfo` once per second until the daemon responds
+3. **Start Block Explorer (fbbe) and Electrs (Electrum + Esplora)**
+   - Both start in parallel once bitcoind is ready, logging to `fbbe.log` and `esplora.log`
+4. **Fund the Faucet Wallet**
+   - On a fresh chain (block height 0): creates a wallet named `faucet` with `load_on_startup=true` and mines 101 blocks to it, providing mature coins for instant funding of test wallets
+   - On subsequent starts: the existing faucet wallet auto-loads and a single new block is mined to it
 
 ## Resource Requirements
 
@@ -253,17 +247,17 @@ The actual resource usage is typically lower:
 
 ## Data Persistence
 
-By default, the container does **not** persist blockchain data between restarts. Each time you stop and start the container, you get a fresh blockchain with 101 blocks and a funded faucet wallet.
+The blockchain **persists** between container stops and starts: blocks, wallets, and transactions survive a `just stop` / `just start` cycle because they live in the container's filesystem. The data is only lost if the container itself is removed, or explicitly wiped with `just reset` — which deletes the chain data and Esplora/Electrum index and restarts the container to bootstrap a fresh network.
 
-### Persistent Data Locations (inside container)
+### Data Locations (inside container)
 
 - Bitcoin data: `/root/.bitcoin/regtest/`
-- Electrs data: `/root/.electrs/` (created at runtime)
+- Electrs/Esplora index: `/db/regtest/`
 - Logs: `/root/log/`
 
-## Network Isolation
+## Network Exposure
 
-The container runs on Podman's default network. Services are exposed to the host through port mappings but are not directly accessible from other machines on your network unless you configure additional port forwarding.
+The container runs on Podman's default network, with services exposed to the host through port mappings. Because the ports are published on `0.0.0.0` (all interfaces), they are reachable not only from the host machine but also from **other devices on your local network** via the host's LAN IP address — this is what enables testing mobile apps on real hardware against the regtest node. Run `just services` to see the LAN endpoints.
 
 ## Logging
 
@@ -280,9 +274,9 @@ All services log to `/root/log/` inside the container:
 
 This environment is designed for **local development only**:
 
-- Services bind to `0.0.0.0` inside the container (all interfaces)
+- All ports are published on `0.0.0.0`, making every service reachable from any device on the network your machine is connected to
+- The RPC port (18443) uses well-known credentials (`regtest`/`password`) and gives full control of the node — fine at home, but on untrusted networks (café, conference Wi-Fi) consider stopping the environment with `just stop` or enabling your OS firewall
 - No authentication on Electrum/Esplora/Explorer services
-- Cookie file is world-readable inside the container
 - Not suitable for production or public exposure
 - Do not use real Bitcoin private keys or mainnet data
 

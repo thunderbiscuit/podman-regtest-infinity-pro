@@ -10,7 +10,7 @@ import? "justfile.local"
 repo:
   open https://github.com/thunderbiscuit/podman-regtest-infinity-pro/
 
-[group("Docs")]
+[group("Pod")]
 [doc("List the available services and their endpoints.")]
 services:
   #!/usr/bin/env bash
@@ -33,16 +33,6 @@ services:
   echo ""
   qrencode -t ansiutf8 "http://$LAN_IP:3003"
 
-[group("Docs")]
-[doc("Build the local docs.")]
-builddocs:
-  uv run zensical build
-
-[group("Docs")]
-[doc("Serve the local docs.")]
-servedocs:
-  uv run zensical serve
-
 [group("Pod")]
 [doc("Start your podman machine and regtest environment.")]
 start:
@@ -63,7 +53,7 @@ stop:
     podman --connection regtest stop RegtestInfinityPro
     podman machine stop regtest
   else
-    echo "Machinne is already stopped..."
+    echo "Machine is already stopped..."
   fi
 
 [group("Pod")]
@@ -135,7 +125,7 @@ explorerlogs:
 
 [group("Faucet")]
 [doc("Send bitcoin from the faucet wallet to ADDRESS.")]
-@faucet ADDRESS AMOUNT="1":
+@faucet ADDRESS AMOUNT="0.12345678":
   bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet -named sendtoaddress address={{ADDRESS}} amount={{AMOUNT}} fee_rate=4
 
 [group("Faucet")]
@@ -143,28 +133,7 @@ explorerlogs:
 @faucetbalance:
   bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet getbalance
 
-[group("Default Wallet")]
-[doc("Create a default wallet.")]
-@createwallet:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password createwallet podmanwallet
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=podmanwallet settxfee 0.0001
-
-[group("Default Wallet")]
-[doc("Load the default wallet.")]
-@loadwallet:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password loadwallet podmanwallet
-
-[group("Default Wallet")]
-[doc("Print an address from the default wallet.")]
+[group("Faucet")]
+[doc("Print a new address from the faucet wallet.")]
 @newaddress:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=podmanwallet getnewaddress
-
-[group("Default Wallet")]
-[doc("Print the balance of the default wallet.")]
-@walletbalance:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=podmanwallet getbalance
-
-[group("Default Wallet")]
-[doc("Send bitcoin to ADDRESS using the default wallet.")]
-@sendto ADDRESS:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=podmanwallet -named sendtoaddress address={{ADDRESS}} amount=0.12345678 fee_rate=4
+  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet getnewaddress

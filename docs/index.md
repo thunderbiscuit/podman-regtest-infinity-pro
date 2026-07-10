@@ -18,7 +18,7 @@ Here are examples of what you can do from your command line once the container i
 
 ```shell
 # Send coins
-just sendto <address>
+just faucet <address>
 
 # Mine any number of blocks
 just mine 21

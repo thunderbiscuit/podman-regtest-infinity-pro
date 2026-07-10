@@ -6,16 +6,16 @@ This guide shows how to use the pre-built images for local development and testi
 
 ```bash
 # Pull the image
-docker pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.1.0
+docker pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 
 # Create the container
 docker create --name RegtestInfinityPro \
-  --publish 18443:18443 \
-  --publish 18444:18444 \
-  --publish 3002:3002 \
-  --publish 3003:3003 \
-  --publish 60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.1.0
+  --publish 0.0.0.0:18443:18443 \
+  --publish 0.0.0.0:18444:18444 \
+  --publish 0.0.0.0:3002:3002 \
+  --publish 0.0.0.0:3003:3003 \
+  --publish 0.0.0.0:60401:60401 \
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 
 # Start the container
 docker start RegtestInfinityPro
@@ -24,103 +24,11 @@ docker start RegtestInfinityPro
 sleep 15
 ```
 
-## Using the Just Command Runner
+Publishing the ports on `0.0.0.0` makes the services reachable from other devices on your local network, which is handy for testing mobile apps on real hardware. To restrict a port to your own machine instead, publish it on the loopback interface, e.g. `--publish 127.0.0.1:18443:18443` — a sensible hardening for the RPC port, which uses well-known credentials.
 
-For the best experience, use the provided justfile which wraps all common commands:
+## Manual Commands
 
-### Setup
-
-```bash
-# Download the Docker-compatible justfile
-curl -O https://raw.githubusercontent.com/thunderbiscuit/podman-regtest-infinity-pro/master/justfile-docker
-
-# Rename it to 'justfile'
-mv justfile-docker justfile
-
-# Install just if you don't have it
-# macOS: brew install just
-# Linux: cargo install just
-# See: https://github.com/casey/just
-```
-
-### Available Commands
-
-Once you have the justfile, run `just` to see all available commands:
-
-```bash
-$ just
-
-Available recipes:
-    [Container]
-    default        # List all available commands
-    pull           # Pull the latest image from ghcr.io
-    start          # Create and start the regtest container
-    stop           # Stop the regtest container
-    remove         # Remove the container (keeps the image)
-    shell          # Enter the shell in the container
-    explorer       # Open the block explorer
-
-    [Docs]
-    services       # List the available services and their endpoints
-
-    [Bitcoin Core]
-    cookie         # Print the current session cookie to console
-    mine           # Mine a block, or mine <BLOCKS> number of blocks
-    mineandsendrewardto # Send mining reward to <ADDRESS>
-    cli            # Send a command to bitcoin-cli
-
-    [Logs]
-    logs           # Print all logs to console
-    bitcoindlogs   # Print bitcoin daemon logs to console
-    esploralogs    # Print Esplora logs to console
-    explorerlogs   # Print block explorer logs to console
-
-    [Faucet]
-    faucet         # Send bitcoin from the faucet wallet to ADDRESS
-    faucetbalance  # Print the balance of the faucet wallet
-
-    [Default Wallet]
-    createwallet   # Create a default wallet
-    loadwallet     # Load the default wallet
-    newaddress     # Print an address from the default wallet
-    walletbalance  # Print the balance of the default wallet
-    sendto         # Send bitcoin to ADDRESS using the default wallet
-```
-
-### Example Workflow
-
-```bash
-# Start the container
-just start
-
-# Create a wallet
-just createwallet
-
-# Get a new address
-ADDRESS=$(just newaddress)
-
-# Get funds from the faucet (already has mature coins)
-just faucet $ADDRESS 5
-
-# Mine a block to confirm the transaction
-just mine 1
-
-# Check balance
-just walletbalance
-
-# View logs
-just bitcoindlogs
-
-# Open block explorer
-just explorer
-
-# Stop when done
-just stop
-```
-
-## Manual Commands (Without Just)
-
-If you prefer not to use just, here are the manual Docker commands:
+The repository's `justfile` is built around a Podman machine setup, so with Docker you interact with the container directly. Here are the common commands:
 
 ### Mining Blocks
 
@@ -173,14 +81,14 @@ docker exec RegtestInfinityPro bitcoin-cli \
   --chain=regtest \
   --rpcuser=__cookie__ \
   --rpcpassword="$COOKIE" \
-  createwallet podmanwallet
+  createwallet mywallet
 
 # Get new address
 docker exec RegtestInfinityPro bitcoin-cli \
   --chain=regtest \
   --rpcuser=__cookie__ \
   --rpcpassword="$COOKIE" \
-  -rpcwallet=podmanwallet \
+  -rpcwallet=mywallet \
   getnewaddress
 
 # Check balance
@@ -188,7 +96,7 @@ docker exec RegtestInfinityPro bitcoin-cli \
   --chain=regtest \
   --rpcuser=__cookie__ \
   --rpcpassword="$COOKIE" \
-  -rpcwallet=podmanwallet \
+  -rpcwallet=mywallet \
   getbalance
 ```
 
@@ -232,18 +140,18 @@ docker stop RegtestInfinityPro
 docker stop RegtestInfinityPro
 docker rm RegtestInfinityPro
 docker create --name RegtestInfinityPro \
-  --publish 18443:18443 \
-  --publish 18444:18444 \
-  --publish 3002:3002 \
-  --publish 3003:3003 \
-  --publish 60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.1.0
+  --publish 0.0.0.0:18443:18443 \
+  --publish 0.0.0.0:18444:18444 \
+  --publish 0.0.0.0:3002:3002 \
+  --publish 0.0.0.0:3003:3003 \
+  --publish 0.0.0.0:60401:60401 \
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 docker start RegtestInfinityPro
 ```
 
 ### Persistent Data
 
-By default, the container does not persist data. To keep blockchain data between restarts:
+Blockchain data lives in the container's filesystem, so it survives `docker stop` / `docker start` cycles but is lost when the container is removed. To keep blockchain data across container removal and recreation, use a volume:
 
 ```bash
 # Create a volume
@@ -251,13 +159,13 @@ docker volume create bitcoin-regtest-data
 
 # Create container with volume
 docker create --name RegtestInfinityPro \
-  --publish 18443:18443 \
-  --publish 18444:18444 \
-  --publish 3002:3002 \
-  --publish 3003:3003 \
-  --publish 60401:60401 \
+  --publish 0.0.0.0:18443:18443 \
+  --publish 0.0.0.0:18444:18444 \
+  --publish 0.0.0.0:3002:3002 \
+  --publish 0.0.0.0:3003:3003 \
+  --publish 0.0.0.0:60401:60401 \
   --volume bitcoin-regtest-data:/root/.bitcoin \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.1.0
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 ```
 
 ## Troubleshooting
@@ -284,12 +192,12 @@ lsof -i :18443
 
 # Use different host ports
 docker create --name RegtestInfinityPro \
-  --publish 28443:18443 \
-  --publish 28444:18444 \
-  --publish 13002:3002 \
-  --publish 13003:3003 \
-  --publish 50401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.1.0
+  --publish 0.0.0.0:28443:18443 \
+  --publish 0.0.0.0:28444:18444 \
+  --publish 0.0.0.0:13002:3002 \
+  --publish 0.0.0.0:13003:3003 \
+  --publish 0.0.0.0:50401:60401 \
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 ```
 
 ### Container Won't Start
@@ -305,13 +213,13 @@ docker logs RegtestInfinityPro
 The image works with Podman too - just replace `docker` with `podman`:
 
 ```bash
-podman pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.1.0
+podman pull ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 podman create --name RegtestInfinityPro \
-  --publish 18443:18443 \
-  --publish 18444:18444 \
-  --publish 3002:3002 \
-  --publish 3003:3003 \
-  --publish 60401:60401 \
-  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:v0.1.0
+  --publish 0.0.0.0:18443:18443 \
+  --publish 0.0.0.0:18444:18444 \
+  --publish 0.0.0.0:3002:3002 \
+  --publish 0.0.0.0:3003:3003 \
+  --publish 0.0.0.0:60401:60401 \
+  ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.0
 podman start RegtestInfinityPro
 ```
