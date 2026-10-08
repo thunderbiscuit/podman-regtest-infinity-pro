@@ -4,7 +4,7 @@ ARG BITCOIN_VERSION=31.0
 # =============================================================================
 # BUILDER STAGE
 # =============================================================================
-FROM debian:bookworm AS builder
+FROM debian:trixie AS builder
 
 # Install all build dependencies in a single layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -66,11 +66,11 @@ RUN cmake -B build -DCMAKE_BUILD_TYPE=Release \
 # =============================================================================
 # RUNTIME STAGE
 # =============================================================================
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libssl3 \
+    libssl3t64 \
     netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
