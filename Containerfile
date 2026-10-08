@@ -1,3 +1,6 @@
+# Bitcoin Core version, shared by both stages (override with --build-arg)
+ARG BITCOIN_VERSION=31.0
+
 # =============================================================================
 # BUILDER STAGE
 # =============================================================================
@@ -15,8 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libclang-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Download Bitcoin Core (currently defaults to 29.2)
-ARG BITCOIN_VERSION=29.2
+# Download Bitcoin Core (currently defaults to 31.0)
+ARG BITCOIN_VERSION
 ARG TARGET_ARCH
 ENV BITCOIN_TARBALL=bitcoin-${BITCOIN_VERSION}-${TARGET_ARCH}.tar.gz
 ENV BITCOIN_URL=https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/${BITCOIN_TARBALL}
@@ -59,8 +62,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Bitcoin Core binaries
-ARG BITCOIN_VERSION=29.2
+ARG BITCOIN_VERSION
 COPY --from=builder /opt/bitcoin-${BITCOIN_VERSION}/bin/* /usr/local/bin/
 
 # Copy the Rust binaries
