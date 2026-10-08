@@ -1,0 +1,56 @@
+name: Publish Docs
+
+# Builds the documentation site with zensical and deploys it to GitHub Pages
+# on every push to master that touches docs. It can also be run by hand
+# through a workflow dispatch.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "docs/**"
+      - "zensical.toml"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build:
+    name: "Build the site"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: "Set up uv"
+        uses: astral-sh/setup-uv@v10.2.0
+
+      - name: "Build"
+        run: uv run --locked zensical build --clean --strict
+
+      - name: "Upload the site"
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    name: "Deploy to GitHub Pages"
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: "Deploy"
+        id: deployment
+        uses: actions/deploy-pages@v5
