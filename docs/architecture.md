@@ -154,7 +154,7 @@ ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:{version}
 
 ### Available Versions
 
-- `0.4.0` - Specific version (full semantic versioning)
+- `0.5.0` - Specific version (full semantic versioning)
 
 ### Publishing Workflow
 
@@ -165,10 +165,8 @@ Images are published automatically via GitHub Actions when tags are pushed:
 3. **Push**: Image is pushed to ghcr.io with the exact version tag
 4. **Cache**: Build cache is stored to speed up subsequent builds
 
-Manual builds via `workflow_dispatch` create a `test` tag for development purposes.
-
 The workflow uses:
-- Bitcoin Core version: `29.2` (default)
+- Bitcoin Core version: the `BITCOIN_VERSION` default from the Containerfile (currently `31.0`)
 - Target architecture: `x86_64-linux-gnu` (default for CI)
 
 See `.github/workflows/publish-container.yml` for the complete workflow configuration.
@@ -188,7 +186,8 @@ The container is built using the Containerfile with two important build argument
 ### Build Arguments
 
 **BITCOIN_VERSION**: Specifies which version of Bitcoin Core to install
-- Examples: `28.1`, `27.0`, `29.0`
+- Defaults to `31.0` (set at the top of the Containerfile)
+- Examples: `31.0`, `29.2`, `28.1`
 - Downloads from: `https://bitcoincore.org/bin/bitcoin-core-{VERSION}/`
 
 **TARGET_ARCH**: Specifies the architecture of Bitcoin Core binaries

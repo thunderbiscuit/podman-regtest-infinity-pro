@@ -29,13 +29,13 @@ Make sure you have a podman machine enabled with sufficient resources.
 podman machine init --cpus 4 --memory 4096 --disk-size 20 regtest
 ```
 
-Get into the container's directory and build the container. Note that you must specify a `BITCOIN_VERSION` and `TARGET_ARCH` to use the bitcoin core version you need using the `--build-arg` argument on the `podman` command.
+Get into the container's directory and build the container. Note that you must specify a `TARGET_ARCH` using the `--build-arg` argument on the `podman` command. `BITCOIN_VERSION` is optional and defaults to `31.0`; pass it the same way to use a different version of Bitcoin Core.
 
 ```shell
 cd podman-regtest-infinity-pro/
 podman machine start regtest
-podman --connection regtest build --build-arg BITCOIN_VERSION=29.2 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest-infinity-pro:0.4.0 --file ./Containerfile
-podman --connection regtest create --name RegtestInfinityPro --publish 0.0.0.0:18443:18443 --publish 0.0.0.0:18444:18444 --publish 0.0.0.0:3002:3002 --publish 0.0.0.0:3003:3003 --publish 0.0.0.0:60401:60401 localhost/regtest-infinity-pro:0.4.0
+podman --connection regtest build --build-arg BITCOIN_VERSION=31.0 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest-infinity-pro:0.5.0 --file ./Containerfile
+podman --connection regtest create --name RegtestInfinityPro --publish 0.0.0.0:18443:18443 --publish 0.0.0.0:18444:18444 --publish 0.0.0.0:3002:3002 --publish 0.0.0.0:3003:3003 --publish 0.0.0.0:60401:60401 localhost/regtest-infinity-pro:0.5.0
 
 # Delete all intermediate images not required by the machine anymore
 podman --connection regtest image prune -a

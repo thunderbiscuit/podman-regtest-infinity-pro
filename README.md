@@ -41,7 +41,8 @@ cd ~/podman/podman-regtest-infinity-pro/
 podman machine start regtest
 
 # Set BITCOIN_VERSION and TARGET_ARCH to use the bitcoin core versions you need using the --build-arg argument on the podman command.
-# Examples for BITCOIN_VERSION:
+# Examples for BITCOIN_VERSION (defaults to 31.0 if omitted):
+#    - 31.0
 #    - 29.2
 #    - 28.1
 #    - 27.0
@@ -52,10 +53,10 @@ podman machine start regtest
 #    - win64
 #    - x86_64-linux-gnu
 
-podman --connection regtest build --build-arg BITCOIN_VERSION=29.2 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest-infinity-pro:0.4.0 --file ./Containerfile
+podman --connection regtest build --build-arg BITCOIN_VERSION=31.0 --build-arg TARGET_ARCH=x86_64-linux-gnu --tag localhost/regtest-infinity-pro:0.5.0 --file ./Containerfile
 # Ports published on 0.0.0.0 are reachable from other devices on your local network (great for testing on real phones).
 # Swap 0.0.0.0 for 127.0.0.1 to restrict a port to this machine only.
-podman --connection regtest create --name RegtestInfinityPro --publish 0.0.0.0:18443:18443 --publish 0.0.0.0:18444:18444 --publish 0.0.0.0:3002:3002 --publish 0.0.0.0:3003:3003 --publish 0.0.0.0:60401:60401 localhost/regtest-infinity-pro:0.4.0
+podman --connection regtest create --name RegtestInfinityPro --publish 0.0.0.0:18443:18443 --publish 0.0.0.0:18444:18444 --publish 0.0.0.0:3002:3002 --publish 0.0.0.0:3003:3003 --publish 0.0.0.0:60401:60401 localhost/regtest-infinity-pro:0.5.0
 
 # Using the container
 # Start the machine + pod
