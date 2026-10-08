@@ -3,17 +3,7 @@ name: Publish Container to GHCR
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
-    inputs:
-      bitcoin_version:
-        description: 'Bitcoin Core version (e.g., 29.2)'
-        required: false
-        default: '29.2'
-      target_arch:
-        description: 'Target architecture'
-        required: false
-        default: 'x86_64-linux-gnu'
+      - "v*"
 
 env:
   REGISTRY: ghcr.io
@@ -47,18 +37,6 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
-            type=raw,value=test,enable=${{ github.event_name == 'workflow_dispatch' }}
-
-      - name: Determine build args
-        id: build-args
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "bitcoin_version=${{ github.event.inputs.bitcoin_version }}" >> $GITHUB_OUTPUT
-            echo "target_arch=${{ github.event.inputs.target_arch }}" >> $GITHUB_OUTPUT
-          else
-            echo "bitcoin_version=29.2" >> $GITHUB_OUTPUT
-            echo "target_arch=x86_64-linux-gnu" >> $GITHUB_OUTPUT
-          fi
 
       - name: Build and push container image
         uses: docker/build-push-action@v5
@@ -68,9 +46,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # BITCOIN_VERSION is not passed, so the default declared at the top of the Containerfile is used.
           build-args: |
-            BITCOIN_VERSION=${{ steps.build-args.outputs.bitcoin_version }}
-            TARGET_ARCH=${{ steps.build-args.outputs.target_arch }}
+            TARGET_ARCH=x86_64-linux-gnu
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
