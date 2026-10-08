@@ -17,10 +17,12 @@ services:
   LAN_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1)
   echo ""
   echo "--- Accessible from this machine -------------------------------"
+  echo "Bitcoin Core P2P:                      tcp://127.0.0.1:18444"
   echo "Electrum server:                       tcp://127.0.0.1:60401"
   echo "Esplora server:                        http://127.0.0.1:3002"
-  echo "Electrum server (Android emulators):   tcp://10.0.2.2:60401"
-  echo "Esplora server  (Android emulators):   http://10.0.2.2:3002"
+  echo "Bitcoin Core P2P (Android emulators):  tcp://10.0.2.2:18444"
+  echo "Electrum server  (Android emulators):  tcp://10.0.2.2:60401"
+  echo "Esplora server   (Android emulators):  http://10.0.2.2:3002"
   echo "Fast Bitcoin Block Explorer:           http://127.0.0.1:3003"
   echo ""
   echo "--- Accessible from your local network -------------------------"
@@ -77,6 +79,11 @@ reset:
 [doc("Enter the shell in the pod.")]
 podshell:
   podman --connection regtest exec -it RegtestInfinityPro /bin/bash
+
+[group("Pod")]
+[doc("Open the bitcoin-tui terminal dashboard.")]
+tui:
+  podman --connection regtest exec -it RegtestInfinityPro bitcoin-tui --regtest --user regtest --password password
 
 [group("Pod")]
 [doc("Open the block explorer.")]

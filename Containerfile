@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     git \
     build-essential \
+    cmake \
     pkg-config \
     libssl-dev \
     libclang-dev \
@@ -51,6 +52,17 @@ RUN cargo build --release \
     && mv target/release/fbbe /usr/local/bin/ \
     && rm -rf target .git
 
+# Build bitcoin-tui (pinned to v0.8.3 release commit, Apr 2026)
+# Only the main target is built; the test targets are skipped
+ENV BITCOIN_TUI_COMMIT=e4300eed8e7789a4d8ca3ba3acd8de95ccd3661f
+WORKDIR /root/bitcoin-tui
+RUN git clone https://github.com/janb84/bitcoin-tui.git . && git checkout ${BITCOIN_TUI_COMMIT}
+RUN cmake -B build -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build build --target bitcoin-tui -j$(nproc) \
+    && strip build/bin/bitcoin-tui \
+    && mv build/bin/bitcoin-tui /usr/local/bin/ \
+    && rm -rf build .git
+
 # =============================================================================
 # RUNTIME STAGE
 # =============================================================================
@@ -68,6 +80,9 @@ COPY --from=builder /opt/bitcoin-${BITCOIN_VERSION}/bin/* /usr/local/bin/
 # Copy the Rust binaries
 COPY --from=builder /usr/local/bin/electrs /usr/local/bin/
 COPY --from=builder /usr/local/bin/fbbe /usr/local/bin/
+
+# Copy the bitcoin-tui binary
+COPY --from=builder /usr/local/bin/bitcoin-tui /usr/local/bin/
 
 # Copy startup script
 COPY start-services.sh /usr/local/bin/

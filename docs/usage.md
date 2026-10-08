@@ -64,6 +64,7 @@ Available recipes:
     stop                               # Stop your podman machine and regtest environment.
     reset                              # Reset the regtest network to a fresh state (wipes all blocks and wallets).
     podshell                           # Enter the shell in the pod.
+    tui                                # Open the bitcoin-tui terminal dashboard.
     explorer                           # Open the block explorer.
 
     [Bitcoin Core]
@@ -102,10 +103,12 @@ just services
 Example output from `just services`:
 ```
 --- Accessible from this machine -------------------------------
+Bitcoin Core P2P:                      tcp://127.0.0.1:18444
 Electrum server:                       tcp://127.0.0.1:60401
 Esplora server:                        http://127.0.0.1:3002
-Electrum server (Android emulators):   tcp://10.0.2.2:60401
-Esplora server  (Android emulators):   http://10.0.2.2:3002
+Bitcoin Core P2P (Android emulators):  tcp://10.0.2.2:18444
+Electrum server  (Android emulators):  tcp://10.0.2.2:60401
+Esplora server   (Android emulators):  http://10.0.2.2:3002
 Fast Bitcoin Block Explorer:           http://127.0.0.1:3003
 
 --- Accessible from your local network -------------------------
@@ -139,6 +142,16 @@ just podshell
 # Once inside, you can access bitcoin-cli directly
 bitcoin-cli --chain=regtest getblockchaininfo
 ```
+
+### Terminal Dashboard
+
+The image ships with [bitcoin-tui](https://github.com/janb84/bitcoin-tui), a terminal UI for Bitcoin Core that shows live blockchain, mempool, network, and peer data, and lets you look up transactions by txid.
+
+```shell
+just tui
+```
+
+Use `Tab` or the arrow keys to switch tabs, `/` to search for a transaction, and `q` to quit.
 
 ## Working with Bitcoin Core
 
