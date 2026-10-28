@@ -1,5 +1,7 @@
 import? "justfile.local"
 
+bitcoin_cli := "podman --connection regtest exec RegtestInfinityPro bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password"
+
 [group("Repo")]
 [doc("List all available commands.")]
 @default:
@@ -51,7 +53,7 @@ start:
 stop:
   #!/usr/bin/env bash
   if podman machine inspect regtest | jq --exit-status '.[0].State == "running"' > /dev/null; then
-    bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password stop
+    {{bitcoin_cli}} stop
     podman --connection regtest stop RegtestInfinityPro
     podman machine stop regtest
   else
@@ -64,9 +66,9 @@ reset:
   #!/usr/bin/env bash
   set -euo pipefail
   echo "Stopping the Bitcoin daemon..."
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password stop || true
+  {{bitcoin_cli}} stop || true
   echo "Waiting for the daemon to shut down..."
-  until ! bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password getblockchaininfo > /dev/null 2>&1; do
+  until ! {{bitcoin_cli}} getblockchaininfo > /dev/null 2>&1; do
     sleep 1
   done
   echo "Deleting the regtest chain data and the Esplora/Electrum index..."
@@ -93,22 +95,22 @@ explorer:
 [group("Bitcoin Core")]
 [doc("Mine a block, or mine <BLOCKS> number of blocks.")]
 @mine BLOCKS="1":
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password generatetoaddress {{BLOCKS}} bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq
+  {{bitcoin_cli}} generatetoaddress {{BLOCKS}} bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq
 
 [group("Bitcoin Core")]
 [doc("Send mining reward to <ADDRESS>.")]
 @mineandsendrewardto ADDRESS:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password generatetoaddress 1 {{ADDRESS}}
+  {{bitcoin_cli}} generatetoaddress 1 {{ADDRESS}}
 
 [group("Bitcoin Core")]
 [doc("Send a command to bitcoin-cli.")]
 @cli COMMAND:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password {{COMMAND}}
+  {{bitcoin_cli}} {{COMMAND}}
 
 [group("Bitcoin Core")]
 [doc("Print the height of the blockchain.")]
 @height:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password getblockcount
+  {{bitcoin_cli}} getblockcount
 
 [group("Logs")]
 [doc("Print all logs to console.")]
@@ -133,14 +135,14 @@ explorerlogs:
 [group("Faucet")]
 [doc("Send bitcoin from the faucet wallet to ADDRESS.")]
 @faucet ADDRESS AMOUNT="0.12345678":
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet -named sendtoaddress address={{ADDRESS}} amount={{AMOUNT}} fee_rate=4
+  {{bitcoin_cli}} -rpcwallet=faucet -named sendtoaddress address={{ADDRESS}} amount={{AMOUNT}} fee_rate=4
 
 [group("Faucet")]
 [doc("Print the balance of the faucet wallet.")]
 @faucetbalance:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet getbalance
+  {{bitcoin_cli}} -rpcwallet=faucet getbalance
 
 [group("Faucet")]
 [doc("Print a new address from the faucet wallet.")]
 @newaddress:
-  bitcoin-cli --chain=regtest --rpcuser=regtest --rpcpassword=password -rpcwallet=faucet getnewaddress
+  {{bitcoin_cli}} -rpcwallet=faucet getnewaddress
